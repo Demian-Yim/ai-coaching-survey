@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }
 
 const AppContent: React.FC = () => {
     return (
-        <div className="bg-slate-50 min-h-screen text-slate-800">
+        <div className="min-h-screen text-slate-200">
             <Header />
             <main className="container mx-auto p-4 md:p-8">
                 <Routes>

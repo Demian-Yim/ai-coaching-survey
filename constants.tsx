@@ -218,4 +218,4 @@ export const SURVEY_QUESTIONS = [
             }
         ]
     }
-];
+] as const; // FIX: Add 'as const' to provide TypeScript with more specific types and prevent type inference issues.

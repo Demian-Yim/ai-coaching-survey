@@ -1,46 +1,53 @@
-
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 export const downloadResultsAsPDF = async (elementId: string, filename: string): Promise<void> => {
-    const input = document.getElementById(elementId);
-    if (!input) {
+    const reportElement = document.getElementById(elementId);
+    if (!reportElement) {
         console.error(`Element with id "${elementId}" not found.`);
         return;
     }
 
-    try {
-        const canvas = await html2canvas(input, {
-            scale: 2, // Higher scale for better quality
-            useCORS: true,
-            backgroundColor: '#ffffff'
-        });
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const margin = 15;
+    let y = margin;
 
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const ratio = canvasWidth / canvasHeight;
-        const imgWidth = pdfWidth - 20; // with margin
-        const imgHeight = imgWidth / ratio;
+    // Get direct children of the report element to process them one by one
+    const sections = Array.from(reportElement.children) as HTMLElement[];
 
-        let heightLeft = imgHeight;
-        let position = 10; // top margin
+    for (const section of sections) {
+        try {
+            // Ensure styles are applied before rendering
+            await new Promise(resolve => setTimeout(resolve, 0));
 
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= (pdfHeight - 20); // page height with margin
+            const canvas = await html2canvas(section, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null, // Use the element's background
+            });
 
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight + 10;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= (pdfHeight - 20);
+            const imgData = canvas.toDataURL('image/png');
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const ratio = canvasWidth / canvasHeight;
+
+            const imgWidth = pdfWidth - margin * 2;
+            const imgHeight = imgWidth / ratio;
+
+            // Check if the image fits on the current page
+            if (y + imgHeight > pdfHeight - margin) {
+                pdf.addPage();
+                y = margin; // Reset y position for new page
+            }
+
+            pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+            y += imgHeight + 10; // Add image height and some padding between sections
+        } catch (error) {
+            console.error('Could not process section for PDF:', section, error);
         }
-
-        pdf.save(`${filename}.pdf`);
-    } catch (error) {
-        console.error("Error generating PDF:", error);
     }
+
+    pdf.save(`${filename}.pdf`);
 };

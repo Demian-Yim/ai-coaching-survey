@@ -24,7 +24,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     const login = (password: string): boolean => {
-        if (password === 'rescuemyself') {
+        if (password === 'inamoment') {
             setIsAdmin(true);
             sessionStorage.setItem('isAdmin', 'true');
             return true;

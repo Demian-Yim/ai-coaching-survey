@@ -2,76 +2,71 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const WelcomePage: React.FC = () => {
+    const imageUrl = "https://raw.githubusercontent.com/Demian-Yim/ai-coaching-survey/main/%ED%94%84%EB%A1%9C%ED%95%84_%EB%8D%B0%EB%AF%B8%EC%95%88.jpg";
+    const videoUrl = "https://raw.githubusercontent.com/Demian-Yim/ai-coaching-survey/main/A_bright_refreshing_202508211752_r800k.mp4";
+
     return (
-        <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg animate-fade-in-up space-y-12">
-            <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">🚀 찐 HRD 실무자가 알려주는 AI 실전 워크숍</h1>
-                <p className="text-lg md:text-xl text-gray-600 mb-6">6시간 실습 심화 과정 · 소수정예 7명 · 현업 실무자 전용</p>
-                
-                <div className="inline-block bg-blue-100 text-blue-800 font-bold px-4 py-2 rounded-full mb-8 text-sm md:text-base">
-                    📅 8월 22일 (금) 오전 10시 ~ 저녁 5시 | 강남역 도보 3분 세미나룸
+        <div className="space-y-12 md:space-y-16 py-8">
+            {/* Hero Section */}
+            <div className="text-center bg-slate-900/70 backdrop-blur-sm border border-cyan-500/30 p-8 md:p-12 rounded-2xl shadow-2xl max-w-5xl mx-auto">
+                <h2 className="text-3xl font-semibold text-cyan-400 mb-4">&lt;9/15 (월) AI 코칭&gt;</h2>
+                <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300 leading-tight mb-6">
+                    “내 일”을 바꾸는<br />AI 200% 활용법
+                </h1>
+                <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8 text-slate-300 text-xl">
+                    <span className="flex items-center"><span className="mr-2 text-xl">📅</span> 2025년 9월 15일(월) 10:00 - 17:00</span>
+                    <span className="flex items-center"><span className="mr-2 text-xl">📍</span> 구루피플스 강의장</span>
                 </div>
             </div>
-             <div className="max-w-4xl mx-auto">
-                 <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-xl">
-                    <video className="w-full h-full object-cover" controls autoPlay loop muted playsInline>
-                        <source src="https://videos.openai.com/vg-assets/assets%2Ftask_01k33677v5ex69ddqemrt5g521%2Ftask_01k33677v5ex69ddqemrt5g521_genid_26b7d746-6d94-4583-b3f6-a1d927c9d17b_25_08_20_07_31_084148%2Fvideos%2F00000_610771425%2Fsource.mp4?st=2025-08-21T05%3A20%3A20Z&se=2025-08-27T06%3A20%3A20Z&sks=b&skt=2025-08-21T05%3A20%3A20Z&ske=2025-08-27T06%3A20%3A20Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8ebb0df1-a278-4e2e-9c20-f2d373479b3a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=%2F9dyLm9iULBX6vPINdvYUdktFS1FkiCA9iHcRbbdls4%3D&az=oaivgprodscus" type="video/mp4" />
-                        브라우저에서 영상을 지원하지 않습니다.
+
+            {/* Instructor Intro Section */}
+            <div className="max-w-2xl mx-auto text-center bg-slate-900/70 backdrop-blur-sm border border-cyan-500/30 p-10 rounded-2xl shadow-2xl">
+                <div className="relative inline-block mb-8">
+                    <div className="p-1.5 rounded-full bg-gradient-to-tr from-cyan-400 via-pink-500 to-yellow-400 neon-glow-profile">
+                         <img src={imageUrl} alt="데미안 임정훈 강사" className="w-40 h-40 rounded-full object-cover border-4 border-slate-800" />
+                    </div>
+                </div>
+                
+                <h2 className="text-3xl font-bold text-slate-100 mb-4">
+                    <span role="img" aria-label="waving hand">👋</span> 반갑습니다!
+                </h2>
+                <p className="text-slate-300 text-2xl mb-4 font-semibold">데미안 임정훈입니다.</p>
+                <p className="text-slate-400 text-xl leading-relaxed max-w-md mx-auto">
+                    실무에서 정말 바로 써먹을 수 있는 AI 활용법과 현업 이슈 해결 과정을 전하고, 진짜 이야기를 나누고 보아요~ <span role="img" aria-label="rocket">🚀</span>
+                </p>
+            </div>
+            
+            {/* Video Section */}
+            <div className="max-w-4xl mx-auto text-center">
+                 <div className="bg-slate-900/70 backdrop-blur-sm border border-cyan-500/30 p-2 rounded-2xl shadow-2xl">
+                    <video 
+                        src={videoUrl}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full rounded-xl"
+                    >
+                        Your browser does not support the video tag.
                     </video>
                  </div>
             </div>
 
-            {/* Instructor Introduction Section */}
-            <div className="max-w-2xl mx-auto text-center bg-slate-50 p-8 rounded-2xl">
-                <div 
-                    className="relative w-48 h-48 mx-auto mb-6 p-2 bg-gradient-to-tr from-yellow-300 via-red-400 to-blue-500 rounded-full"
-                >
-                    <div 
-                        className="w-full h-full bg-center bg-cover rounded-full"
-                        style={{ backgroundImage: `url('https://raw.githubusercontent.com/Demian-Yim/hrd_club/Hompage/Round_Demian_2020.png')` }}
-                    ></div>
-                </div>
-                <h2 className="text-3xl font-bold mb-4">👋 반갑습니다!</h2>
-                <p className="text-xl text-gray-800 mb-4"><strong>데미안 임정훈</strong>입니다.</p>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                    AI를 활용하며 겪은 진짜 이야기를 나누고 싶어,<br />
-                    이 자리에 참여하게 되었습니다.<br />
-                    실무에서 정말 써먹을 수 있는 AI 활용법과 현업 이슈 해결을,<br />
-                    함께 고민하고 나누고 싶습니다. 🚀
-                </p>
-            </div>
-
-
-            <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 text-left">
-                <div className="bg-slate-50 p-6 rounded-lg">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-700">과정 소개</h2>
-                    <p className="text-gray-600 leading-relaxed">
-                        단순한 AI 도구 사용법을 넘어, <span className="font-bold text-blue-600">내 일의 흐름</span>을 바꾸는 실습 중심의 코칭입니다.
-                        AI 200% 활용을 위한 PC 기본 세팅부터 나만의 AI 맞춤 설정, 실무 문서 작성, 음성/영상 모드 활용, 그리고 간단한 앱/웹 서비스 제작까지, 실제 업무에 바로 적용 가능한 내용으로 구성되었습니다.
-                    </p>
-                </div>
-                <div className="bg-slate-50 p-6 rounded-lg">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-700">코칭 특징</h2>
-                     <ul className="list-disc list-inside text-gray-600 space-y-2">
-                        <li>7명 소수 정예 맞춤형 코칭</li>
-                        <li>실무 중심의 프로젝트 기반 학습</li>
-                        <li>Before & After가 보장되는 성과</li>
-                        <li>참여자 간 네트워킹 및 경험 공유</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div className="text-center mt-12">
-                <Link 
-                    to="/survey"
-                    className="bg-blue-600 text-white font-bold text-lg px-12 py-4 rounded-full hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg"
-                >
+            {/* Call to Action */}
+            <div className="max-w-4xl mx-auto text-center bg-slate-800/60 backdrop-blur-sm border border-cyan-500/30 p-10 rounded-2xl shadow-xl">
+                 <h2 className="text-3xl font-bold text-slate-100 mb-4">최적의 학습 경험을 위해, 먼저 진단해주세요!</h2>
+                 <p className="text-slate-400 mb-8 text-xl">맞춤형 코칭을 위해 여러분의 현재 AI 활용 수준을 알려주세요! (약 5-8분 소요)</p>
+                 <Link to="/survey" className="inline-block bg-cyan-500 text-slate-900 font-bold py-4 px-10 rounded-lg text-xl hover:bg-cyan-400 transition-all transform hover:scale-105 shadow-lg neon-glow border-2 border-cyan-300">
                     사전 역량 진단 시작하기
                 </Link>
-                <p className="mt-4 text-sm text-gray-500">
-                    맞춤형 코칭을 위해 여러분의 현재 AI 활용 수준을 알려주세요! (약 5-8분 소요)
-                </p>
             </div>
+
+            <footer className="mt-16 py-8 border-t border-slate-700/50 text-slate-400 text-center">
+                <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                    Demian 임정훈
+                </p>
+                <p className="text-sm mt-2">&copy; {new Date().getFullYear()} All Rights Reserved.</p>
+            </footer>
         </div>
     );
 };

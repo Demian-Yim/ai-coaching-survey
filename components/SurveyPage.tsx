@@ -65,21 +65,21 @@ const SurveyPage: React.FC = () => {
     };
     
     return (
-        <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-            <h1 className="text-3xl font-bold text-center mb-2">AI 활용 역량 사전 진단</h1>
-            <p className="text-center text-slate-600 mb-8">맞춤형 코칭 설계를 위해 여러분의 소중한 의견을 들려주세요.</p>
+        <div className="max-w-4xl mx-auto bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 rounded-2xl shadow-2xl">
+            <h1 className="text-3xl font-bold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-300">AI 활용 역량 사전 진단</h1>
+            <p className="text-center text-slate-400 mb-8">맞춤형 코칭 설계를 위해 여러분의 소중한 의견을 들려주세요.</p>
             
             <form onSubmit={handleSubmit} className="space-y-10">
                 {SURVEY_QUESTIONS.map(section => (
-                    <div key={section.id} className="p-6 border border-slate-200 rounded-lg bg-slate-50/50">
-                        <h2 className="text-2xl font-semibold mb-1 text-blue-700">{section.title}</h2>
-                        {section.description && <p className="text-slate-500 mb-6">{section.description}</p>}
+                    <div key={section.id} className="p-6 border border-slate-700 rounded-lg bg-slate-800/50">
+                        <h2 className="text-2xl font-semibold mb-1 text-cyan-400">{section.title}</h2>
+                        {'description' in section && section.description && <p className="text-slate-400 mb-6">{section.description}</p>}
                         
                         <div className="space-y-6">
                             {section.questions.map(q => (
-                                <div key={q.id} className="bg-white p-4 rounded-md shadow-sm border border-slate-100">
-                                    <label htmlFor={q.id} className="block text-lg font-medium text-slate-800 mb-2">{q.label} {q.required && <span className="text-red-500">*</span>}</label>
-                                    {q.description && <p className="text-sm text-slate-500 mb-3">{q.description}</p>}
+                                <div key={q.id} className="bg-slate-900/70 p-4 rounded-md shadow-sm border border-slate-800">
+                                    <label htmlFor={q.id} className="block text-lg font-medium text-slate-200 mb-2">{q.label} {q.required && <span className="text-red-500">*</span>}</label>
+                                    {q.description && <p className="text-sm text-slate-400 mb-3">{q.description}</p>}
                                     
                                     {q.type === 'multi-text' && q.fields && (
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -92,7 +92,7 @@ const SurveyPage: React.FC = () => {
                                                         placeholder={field.placeholder}
                                                         onChange={handleInputChange}
                                                         required={q.required}
-                                                        className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                                        className="w-full p-3 bg-slate-800 border border-slate-600 rounded-md focus:ring-2 focus:ring-cyan-500 text-white"
                                                     />
                                                      {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
                                                  </div>
@@ -109,7 +109,7 @@ const SurveyPage: React.FC = () => {
                                                 onChange={handleInputChange}
                                                 placeholder={q.placeholder}
                                                 required={q.required}
-                                                className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                                className="w-full p-3 bg-slate-800 border border-slate-600 rounded-md focus:ring-2 focus:ring-cyan-500 text-white"
                                             />
                                             {errors[q.id] && <p className="text-red-500 text-sm mt-1">{errors[q.id]}</p>}
                                         </>
@@ -122,44 +122,57 @@ const SurveyPage: React.FC = () => {
                                             rows={5}
                                             placeholder={q.placeholder}
                                             onChange={handleInputChange}
-                                            className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                            className="w-full p-3 bg-slate-800 border border-slate-600 rounded-md focus:ring-2 focus:ring-cyan-500 text-white"
                                         />
                                     )}
                                     
                                     {(q.type === 'radio' || q.type === 'checkbox') && (
                                         <div className="space-y-2">
-                                            {q.options?.map(opt => (
-                                                 <label key={opt.value} className="flex items-center p-3 border rounded-md hover:bg-blue-50 cursor-pointer transition-colors">
-                                                    <input
-                                                        type={q.type}
-                                                        name={q.id}
-                                                        value={opt.value}
-                                                        onChange={handleInputChange}
-                                                        className={`h-5 w-5 ${q.type === 'radio' ? 'rounded-full' : 'rounded'} text-blue-600 focus:ring-blue-500 border-slate-300 mr-3`}
-                                                    />
-                                                    <span>{opt.label}</span>
-                                                    {opt.hasTextInput && (
-                                                        <input type="text" className="ml-2 p-1 border-b flex-grow" placeholder="직접 입력" name={`${q.id}_other_text`} onChange={handleInputChange} />
-                                                    )}
-                                                </label>
-                                            ))}
+                                            {q.options?.map(opt => {
+                                                const isChecked = q.type === 'checkbox' 
+                                                    ? (formData[q.id] || []).includes(opt.value)
+                                                    : formData[q.id] === opt.value;
+                                                
+                                                return (
+                                                    <label key={opt.value} className={`flex items-center p-3 border rounded-md cursor-pointer transition-all duration-200 ${isChecked ? 'bg-cyan-500/20 border-cyan-500' : 'bg-slate-800/50 border-slate-700 hover:bg-slate-700/50'}`}>
+                                                        <input
+                                                            type={q.type}
+                                                            name={q.id}
+                                                            value={opt.value}
+                                                            checked={isChecked}
+                                                            onChange={handleInputChange}
+                                                            className="sr-only" // Hide original input
+                                                        />
+                                                        <div className={`w-5 h-5 mr-3 flex-shrink-0 border-2 rounded-full flex items-center justify-center ${isChecked ? 'border-cyan-400' : 'border-slate-500'}`}>
+                                                          {isChecked && <div className="w-2.5 h-2.5 bg-cyan-400 rounded-full"></div>}
+                                                        </div>
+                                                        <span className={`${isChecked ? 'text-cyan-300' : 'text-slate-300'}`}>{opt.label}</span>
+                                                        {opt.hasTextInput && (
+                                                            <input type="text" className="ml-2 p-1 border-b bg-transparent border-slate-500 focus:border-cyan-400 flex-grow text-white outline-none" placeholder="직접 입력" name={`${q.id}_other_text`} onChange={handleInputChange} />
+                                                        )}
+                                                    </label>
+                                                )
+                                            })}
                                         </div>
                                     )}
 
                                     {q.type === 'rating' && (
-                                        <div className="flex justify-around items-center bg-slate-50 p-4 rounded-md">
+                                        <div className="flex justify-around items-center bg-slate-800/50 p-4 rounded-md">
                                             {q.options?.map(val => (
-                                                <label key={val} className="flex flex-col items-center space-y-1 cursor-pointer p-2 rounded-md hover:bg-blue-100">
-                                                    <span className={`font-semibold ${formData[q.id] === val ? 'text-blue-600' : 'text-slate-600'}`}>{val}점</span>
+                                                <label key={val} className={`flex flex-col items-center space-y-2 cursor-pointer p-2 rounded-md transition-all ${formData[q.id] === val ? 'bg-cyan-500/20' : 'hover:bg-slate-700/50'}`}>
+                                                    <span className={`font-semibold text-lg ${formData[q.id] === val ? 'text-cyan-300' : 'text-slate-400'}`}>{val}점</span>
                                                     <input
                                                         type="radio"
                                                         name={q.id}
                                                         value={val}
                                                         checked={formData[q.id] === val}
                                                         onChange={() => handleRadioChange(q.id, val as number)}
-                                                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-slate-300"
+                                                        className="sr-only"
                                                         required
                                                     />
+                                                     <div className={`w-6 h-6 flex items-center justify-center rounded-full border-2 ${formData[q.id] === val ? 'border-cyan-400' : 'border-slate-600'}`}>
+                                                        {formData[q.id] === val && <div className="w-3 h-3 rounded-full bg-cyan-400"></div>}
+                                                    </div>
                                                 </label>
                                             ))}
                                         </div>
@@ -170,8 +183,8 @@ const SurveyPage: React.FC = () => {
                     </div>
                 ))}
                 
-                <button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-lg text-lg hover:bg-blue-700 transition-all transform hover:scale-105 disabled:bg-slate-400 disabled:scale-100 flex justify-center items-center">
-                    {isSubmitting ? <><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div> 제출 중...</> : '🚀 설문 제출 및 결과 확인'}
+                <button type="submit" disabled={isSubmitting} className="w-full bg-cyan-500 text-slate-900 font-bold py-4 px-6 rounded-lg text-lg hover:bg-cyan-400 transition-all transform hover:scale-105 disabled:bg-slate-600 disabled:scale-100 flex justify-center items-center neon-glow border-2 border-cyan-300">
+                    {isSubmitting ? <><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-900 mr-3"></div> 제출 중...</> : '🚀 분석 시작하기'}
                 </button>
             </form>
         </div>
