@@ -7,33 +7,50 @@ export const SURVEY_QUESTIONS = [
         questions: [
             { id: 'user_details', label: '0. 응답자 정보를 입력해주세요. (결과 확인 및 분석용)', type: 'multi-text', required: true, fields: [
                 { id: 'name', placeholder: '이름 (예: 홍길동)' },
-                { id: 'company', placeholder: '회사명 (예: 구루피플스)' },
-                { id: 'position', placeholder: '직책 (예: 책임, 선임)' },
+                { id: 'company', placeholder: '회사명 (예: 구루피플스, 프리랜서)' },
+                { id: 'position', placeholder: '직책 (예: 팀장, 팀원, 책임)' },
             ]},
-            { id: 'laptop_type', label: '1. 실무에 사용하시는 노트북 종류와 연식을 알려주세요.', description: '예: 맥북에어 M2 (2022년), LG그램 15 (2021년)', type: 'text', required: true, placeholder: '노트북 종류 및 연식 입력' },
+            { id: 'laptop_model', label: '1. 실무에 사용하시는 노트북 기종을 알려주세요.', description: '예: 맥북에어 M2, LG그램 15', type: 'text', required: true, placeholder: '노트북 기종 입력' },
+            {
+                id: 'laptop_year',
+                label: '2. 노트북 제품 연식 또는 구매 연도를 선택해주세요.',
+                type: 'select',
+                required: true,
+                options: [
+                    { value: '2025', label: '2025년' },
+                    { value: '2024', label: '2024년' },
+                    { value: '2023', label: '2023년' },
+                    { value: '2022', label: '2022년' },
+                    { value: '2021', label: '2021년' },
+                    { value: '2020', label: '2020년' },
+                    { value: '2019', label: '2019년' },
+                    { value: '2018_before', label: '2018년 이전' },
+                ]
+            },
             { 
                 id: 'role', 
-                label: '2. 주요 역할 및 직무를 선택해주세요', 
-                type: 'radio', 
+                label: '3. 주요 역할 및 직무를 선택해주세요', 
+                type: 'select', 
+                required: true,
                 options: [
-                    { value: 'hrd_manager', label: '👑 HRD담당자 (팀장급)' },
-                    { value: 'hrd_staff', label: '💼 HRD담당자 (실무자급)' },
-                    { value: 'hr_recruit', label: '🎯 인사담당자 (채용/평가)' },
-                    { value: 'hr_policy', label: '📋 인사담당자 (제도/기획)' },
-                    { value: 'ld_expert', label: '🎓 L&D 전문가' },
-                    { value: 'od_specialist', label: '🏗️ 조직개발 담당자' },
-                    { value: 'coach_internal', label: '🎨 코치·퍼실리테이터 (사내)' },
-                    { value: 'coach_external', label: '🌟 코치·퍼실리테이터 (외부)' },
-                    { value: 'consultant', label: '💡 컨설턴트/프리랜서' },
-                    { value: 'executive', label: '🎖️ 경영진/임원' },
-                    { value: 'other', label: '✏️ 기타', hasTextInput: true },
+                    { value: 'hrd_planning_strategy', label: 'HRD (교육기획/전략)' },
+                    { value: 'hrd_operation', label: 'HRD (교육운영/실무)' },
+                    { value: 'hr_generalist', label: 'HR (인사기획/제도/채용/평가/보상)' },
+                    { value: 'org_development_culture', label: '조직개발/조직문화' },
+                    { value: 'leadership_coaching', label: '리더십개발/코칭/퍼실리테이션' },
+                    { value: 'executive', label: '경영진/임원' },
+                    { value: 'team_leader', label: '현업 리더/팀장' },
+                    { value: 'external_expert', label: '외부 컨설턴트/강사/코치' },
+                    { value: 'freelancer_one_person_company', label: '1인 기업/프리랜서' },
+                    { value: 'other', label: '기타' },
                 ] 
             },
             {
                 id: 'company_size',
-                label: '3. 소속 조직 규모는?',
+                label: '4. 소속 조직 규모는?',
                 type: 'radio',
                 options: [
+                    { value: 'freelancer', label: '🙋 프리랜서 / 1인 기업' },
                     { value: 'under_30', label: '🚀 30명 미만 (스타트업/소규모)' },
                     { value: '30_99', label: '🏢 30-99명 (중소기업)' },
                     { value: '100_299', label: '🏭 100-299명 (중소기업)' },
@@ -46,7 +63,7 @@ export const SURVEY_QUESTIONS = [
             },
              {
                 id: 'experience',
-                label: '4. HRD/인사 관련 업무 경력은?',
+                label: '5. 현재 직무(역할) 관련 총 경력은?',
                 type: 'radio',
                 options: [
                    { value: 'under_1', label: '🌱 1년 미만' },
@@ -65,7 +82,7 @@ export const SURVEY_QUESTIONS = [
         questions: [
             {
                 id: 'ai_policy',
-                label: '5. 귀하 조직의 AI 사용 정책 수준은?',
+                label: '6. 귀하 조직의 AI 사용 정책 수준은?',
                 type: 'radio',
                 options: [
                     { value: 'formal_guideline', label: '📋 명문화된 AI 사용 가이드라인과 허용 도구 리스트 존재' },
@@ -79,18 +96,33 @@ export const SURVEY_QUESTIONS = [
             },
             {
                 id: 'allowed_tools',
-                label: '6. 조직에서 공식적으로 허용/제공하는 AI 도구는? (복수선택)',
+                label: '7. 조직에서 공식적으로 허용/제공하는 AI 도구는? (복수선택)',
                 type: 'checkbox',
                 options: [
-                    { value: 'chatgpt_free', label: '🤖 ChatGPT (무료 버전)' },
+                    // Multimodal
                     { value: 'chatgpt_paid', label: '💎 ChatGPT (유료 버전/Plus/Team/Enterprise)' },
-                    { value: 'claude_free', label: '🎭 Claude (무료 버전)' },
                     { value: 'claude_paid', label: '⭐ Claude (유료 버전/Pro/Team)' },
                     { value: 'gemini', label: '💫 Google Gemini (구 Bard)' },
                     { value: 'copilot_m365', label: '🏢 Microsoft Copilot (Office 365/M365)' },
+                    { value: 'notebooklm', label: '📒 Google NotebookLM' },
+                    { value: 'groq', label: '⚡️ Groq' },
                     { value: 'wrtn', label: '🇰🇷 뤼튼 (Wrtn)' },
                     { value: 'hyperclova', label: '🔥 네이버 하이퍼클로바X' },
+                    // Video
+                    { value: 'sora', label: '🎬 OpenAI Sora' },
+                    { value: 'runwayml', label: '🏃‍♀️ RunwayML' },
+                    { value: 'pika', label: '✨ Pika Labs' },
+                    // Image
+                    { value: 'midjourney', label: '🎨 Midjourney' },
+                    { value: 'stablediffusion', label: '🖼️ Stable Diffusion' },
+                    { value: 'dalle', label: '🖌️ DALL-E' },
+                    // Audio
+                    { value: 'suno', label: '🎵 Suno AI' },
+                    { value: 'udio', label: '🎶 Udio' },
+                    // Other
                     { value: 'internal_ai', label: '🛠️ 사내 자체 개발 AI 플랫폼' },
+                    { value: 'chatgpt_free', label: '🤖 ChatGPT (무료 버전)' },
+                    { value: 'claude_free', label: '🎭 Claude (무료 버전)' },
                     { value: 'all_prohibited', label: '❌ 모든 외부 AI 도구 사용 금지' },
                     { value: 'unknown_tools', label: '❓ 허용 도구를 정확히 모름' },
                 ]
@@ -103,7 +135,7 @@ export const SURVEY_QUESTIONS = [
         questions: [
             {
                 id: 'first_use',
-                label: '7. 개인적으로 AI 도구를 처음 사용한 시기는?',
+                label: '8. 개인적으로 AI 도구를 처음 사용한 시기는?',
                 type: 'radio',
                 options: [
                     { value: 'before_2022', label: '🦕 2021년 이전 (GPT-3 이전 시대)' },
@@ -111,29 +143,45 @@ export const SURVEY_QUESTIONS = [
                     { value: 'early_2023', label: '🔥 2023년 초반 (ChatGPT 초기 열풍)' },
                     { value: 'mid_2023', label: '📈 2023년 중반' },
                     { value: 'late_2023', label: '🍂 2023년 하반기' },
-                    { value: '2024_after', label: '⭐ 2024년 이후' },
+                    { value: '2024', label: '⭐ 2024년' },
+                    { value: '2025_onward', label: '🚀 2025년 이후' },
                     { value: 'never', label: '🤔 아직 사용해본 적 없음' },
                 ]
             },
             {
                 id: 'frequently_used',
-                label: '8. 현재 개인적으로 가장 자주 사용하는 AI 도구는? (최대 3개)',
+                label: '9. 현재 개인적으로 가장 자주 사용하는 AI 도구는? (최대 3개)',
                 type: 'checkbox',
                 options: [
+                    // Multimodal
                     { value: 'chatgpt', label: '🤖 ChatGPT' },
                     { value: 'claude', label: '🎭 Claude' },
                     { value: 'gemini', label: '💫 Google Gemini' },
                     { value: 'copilot', label: '🏢 Microsoft Copilot' },
+                    { value: 'notebooklm', label: '📒 Google NotebookLM' },
+                    { value: 'groq', label: '⚡️ Groq' },
+                    { value: 'perplexity', label: '🔍 Perplexity AI' },
                     { value: 'wrtn', label: '🇰🇷 뤼튼 (Wrtn)' },
                     { value: 'notion_ai', label: '📝 Notion AI' },
-                    { value: 'perplexity', label: '🔍 Perplexity AI' },
+                    // Video
+                    { value: 'sora', label: '🎬 OpenAI Sora' },
+                    { value: 'runwayml', label: '🏃‍♀️ RunwayML' },
+                    { value: 'pika', label: '✨ Pika Labs' },
+                    // Image
+                    { value: 'midjourney', label: '🎨 Midjourney' },
+                    { value: 'stablediffusion', label: '🖼️ Stable Diffusion' },
+                    { value: 'dalle', label: '🖌️ DALL-E' },
+                    // Audio
+                    { value: 'suno', label: '🎵 Suno AI' },
+                    { value: 'udio', label: '🎶 Udio' },
+                    // Other
                     { value: 'none', label: '❌ 특별히 자주 쓰는 도구 없음' },
                 ],
                 maxSelection: 3
             },
             {
                 id: 'usage_frequency',
-                label: '9. 개인적인 AI 사용 빈도는?',
+                label: '10. 개인적인 AI 사용 빈도는?',
                 type: 'radio',
                 options: [
                     { value: 'very_frequent', label: '🔥 하루 10회 이상 (상시 활용)' },
@@ -150,11 +198,11 @@ export const SURVEY_QUESTIONS = [
      {
         id: 'part4',
         title: 'PART 4. AI 역량 자가 진단',
-        description: 'AI 리터러시 구성요소별 현재 수준을 평가해주세요 (1점=매우 부족, 5점=매우 우수)',
+        description: '각 항목에 대해 자신의 현재 수준을 가장 잘 나타내는 점수를 선택해주세요.\n(1점: 전혀 그렇지 않다 / 2점: 거의 그렇지 않다 / 3점: 보통이다 / 4점: 어느 정도 그렇다 / 5점: 매우 그렇다)',
         questions: [
-            { id: 'understanding', label: '🧠 이해 (Understand)', description: 'AI 원리, 작동방식, 장단점과 한계 이해', type: 'rating', options: [1, 2, 3, 4, 5] },
-            { id: 'application', label: '🛠️ 활용 (Use)', description: '다양한 AI 도구의 능숙하고 효율적인 사용', type: 'rating', options: [1, 2, 3, 4, 5] },
-            { id: 'criticalThinking', label: '🔍 비판적 사고 (Critical Thinking)', description: '결과물의 신뢰성, 윤리성, 적절성 판단', type: 'rating', options: [1, 2, 3, 4, 5] },
+            { id: 'understanding', label: '🧠 이해 (Understand)', description: "AI의 기본 원리, 다양한 모델(e.g., LLM, 생성형 AI)의 작동 방식, 기술적 한계와 잠재적 리스크를 이해하는 능력. (예: '환각' 현상이 왜 발생하는지 설명할 수 있다.)", type: 'rating', options: [1, 2, 3, 4, 5] },
+            { id: 'application', label: '🛠️ 활용 (Use)', description: "자신의 업무 목적에 맞는 AI 도구를 선택하고, 효과적인 프롬프트를 작성하여 원하는 결과물을 생성하며, 반복적인 업무를 자동화하는 능력. (예: 보고서 초안 작성, 데이터 요약, 이미지 생성 등을 AI로 처리할 수 있다.)", type: 'rating', options: [1, 2, 3, 4, 5] },
+            { id: 'criticalThinking', label: '🔍 비판적 사고 (Critical Thinking)', description: "AI가 생성한 결과물의 사실관계, 편향성, 윤리적 문제를 비판적으로 검토하고, 정보의 신뢰도를 판단하며, 책임감 있게 활용하는 능력. (예: AI가 만든 통계자료의 출처를 확인하고 교차 검증할 수 있다.)", type: 'rating', options: [1, 2, 3, 4, 5] },
         ]
     },
     {
@@ -202,19 +250,19 @@ export const SURVEY_QUESTIONS = [
                 id: 'main_concern',
                 label: '13. AI 활용과 관련하여 현재 가장 고민되는 이슈를 구체적으로 적어주세요 (선택사항)',
                 type: 'textarea',
-                placeholder: '예:\n• AI를 활용해도 기대만큼 업무 효율이 오르지 않는 이유와 개선방안이 궁금합니다\n• 보안 제약이 많은 환경에서 효과적으로 AI를 활용하는 구체적 방법을 알고 싶습니다\n• 팀원들의 AI 활용 저항감을 해결하고 조직 차원의 도입을 성공시키는 방법이 고민됩니다'
+                placeholder: '예:\n• 생성형 AI가 만든 결과물의 저작권 이슈가 걱정됩니다. 어디까지 업무에 활용해도 안전한가요?\n• AI를 쓰면 쓸수록 오히려 생각하는 능력이 퇴화하는 것 같아 고민입니다.\n• 저희 팀은 AI 활용에 대한 관심이 너무 낮습니다. 어떻게 해야 동기부여를 할 수 있을까요?'
             },
             {
                 id: 'specific_request',
                 label: '14. 본 교육과정에서 꼭 다뤄주셨으면 하는 부분이나 궁금한 점이 있다면 적어주세요 (선택사항)',
                 type: 'textarea',
-                placeholder: '예:\n• 개인별 맞춤 학습경로를 AI로 설계하는 구체적인 방법과 도구\n• 교육 효과성 측정과 ROI 산출을 AI로 자동화하는 실무 적용법\n• 소규모 조직에서 예산 제약 하에 AI를 도입하는 현실적 전략'
+                placeholder: '예:\n• M365 코파일럿을 조직에 도입했는데, 실제 업무에서 MS 팀즈, 엑셀, 파워포인트와 연계하여 생산성을 높이는 구체적인 시나리오를 많이 보여주세요.\n• 비개발자 HR 담당자가 노코드(No-code) 툴과 AI를 결합하여 간단한 업무 자동화 시스템을 만드는 방법을 배우고 싶습니다.\n• 리더십 코칭이나 성과 피드백 상황에서 AI를 활용할 수 있는 윤리적이고 효과적인 방법이 궁금합니다.'
             },
              {
                 id: 'personal_question',
                 label: '15. 데미안 임정훈 강사에게 개인적으로 질문하고 싶은 내용이 있다면 적어주세요 (선택사항)',
                 type: 'textarea',
-                placeholder: '예:\n• HRD 실무자로서 AI 활용 여정에서 가장 큰 깨달음이나 실패 경험은?\n• AI 시대에 HRD 전문가가 갖춰야 할 가장 중요한 마인드셋은?\n• 보안이 엄격한 대기업에서 AI를 활용하는 노하우는?'
+                placeholder: '예:\n• AI 기술이 빠르게 발전하는데, 어떤 정보를 기준으로 계속 학습해야 할지 막막합니다. 강사님만의 학습 비결이 궁금합니다.\n• AI 때문에 내 직무가 사라질까 불안한 마음이 듭니다. HR 전문가로서 어떻게 커리어를 개발해야 할까요?\n• 수많은 AI 뉴스 중에서 \'진짜\'와 \'과장\'을 구분하는 강사님만의 노하우는 무엇인가요?'
             }
         ]
     }

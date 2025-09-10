@@ -11,7 +11,7 @@ const SurveyPage: React.FC = () => {
     const navigate = useNavigate();
     const { submitSurvey } = useAppContext();
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         
         if (type === 'checkbox') {
@@ -39,7 +39,7 @@ const SurveyPage: React.FC = () => {
         if (!formData.name) newErrors.name = '이름을 입력해주세요.';
         if (!formData.company) newErrors.company = '회사를 입력해주세요.';
         if (!formData.position) newErrors.position = '직책을 입력해주세요.';
-        if (!formData.laptop_type) newErrors.laptop_type = '노트북 정보를 입력해주세요.';
+        if (!formData.laptop_model) newErrors.laptop_model = '노트북 기종을 입력해주세요.';
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -73,7 +73,7 @@ const SurveyPage: React.FC = () => {
                 {SURVEY_QUESTIONS.map(section => (
                     <div key={section.id} className="p-6 border border-slate-700 rounded-lg bg-slate-800/50">
                         <h2 className="text-2xl font-semibold mb-1 text-cyan-400">{section.title}</h2>
-                        {'description' in section && section.description && <p className="text-slate-400 mb-6">{section.description}</p>}
+                        {'description' in section && section.description && <p className="text-slate-400 mb-6 whitespace-pre-line">{section.description}</p>}
                         
                         <div className="space-y-6">
                             {section.questions.map(q => (
@@ -124,6 +124,29 @@ const SurveyPage: React.FC = () => {
                                             onChange={handleInputChange}
                                             className="w-full p-3 bg-slate-800 border border-slate-600 rounded-md focus:ring-2 focus:ring-cyan-500 text-white"
                                         />
+                                    )}
+
+                                    {q.type === 'select' && (
+                                        <div className="relative">
+                                            <select
+                                                id={q.id}
+                                                name={q.id}
+                                                onChange={handleInputChange}
+                                                value={formData[q.id] || ''}
+                                                required={q.required}
+                                                className="w-full p-3 bg-slate-800 border border-slate-600 rounded-md focus:ring-2 focus:ring-cyan-500 text-white appearance-none pr-10"
+                                            >
+                                                <option value="" disabled>-- 선택해주세요 --</option>
+                                                {q.options?.map(opt => (
+                                                    <option key={opt.value} value={opt.value}>
+                                                        {opt.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                            </div>
+                                        </div>
                                     )}
                                     
                                     {(q.type === 'radio' || q.type === 'checkbox') && (
