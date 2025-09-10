@@ -10,6 +10,14 @@ import { SURVEY_QUESTIONS } from '../constants';
 
 const COLORS = ['#00A9FF', '#00E0C7', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#a4de6c', '#d0ed57', '#ffc658'];
 
+const ChartDescription: React.FC<{ analysis: string; checkpoint: string }> = ({ analysis, checkpoint }) => (
+    <div className="text-left text-slate-400 mt-4 text-sm bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+        <p><strong className="text-cyan-400">[분석]</strong> {analysis}</p>
+        <p className="mt-2"><strong className="text-amber-400">[Check Point]</strong> {checkpoint}</p>
+    </div>
+);
+
+
 const DashboardPage: React.FC = () => {
     const { submissions, setSubmissions, deleteSubmission, clearAllSubmissions } = useAppContext();
     const [summary, setSummary] = useState<string>('');
@@ -273,8 +281,8 @@ const DashboardPage: React.FC = () => {
 
             <div className="bg-slate-800/50 p-8 rounded-xl shadow-lg border border-slate-700">
                 <h2 className="text-3xl font-bold mb-8 text-center text-slate-200">📊 세부 문항별 분석</h2>
-                <div className="grid lg:grid-cols-2 gap-x-16 gap-y-24">
-                     <div>
+                <div className="grid lg:grid-cols-2 gap-x-16 gap-y-12">
+                     <div className="flex flex-col">
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">역량별 평균 점수</h3>
                         <ResponsiveContainer width="100%" height={350}>
                             <BarChart data={analysisData.avgCapability} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -286,8 +294,12 @@ const DashboardPage: React.FC = () => {
                                 <Bar dataKey="score" fill="#00A9FF" name="평균 점수" />
                             </BarChart>
                         </ResponsiveContainer>
+                        <ChartDescription 
+                            analysis="참여자들의 AI 역량을 세 가지 핵심 영역으로 나누어 평균 점수를 보여줍니다. '활용' 점수가 상대적으로 높은지, '비판적 사고'가 부족한지 등을 파악하여 강의의 강약 조절에 참고할 수 있습니다."
+                            checkpoint="특정 역량 점수가 평균 2.5점 이하라면, 해당 부분에 대한 기초 개념 설명과 실습 시간을 더 할애할 필요가 있습니다."
+                        />
                     </div>
-                     <div>
+                     <div className="flex flex-col">
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">HR 경력 분포</h3>
                         <ResponsiveContainer width="100%" height={350}>
                             <BarChart data={analysisData.experiences} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -298,12 +310,15 @@ const DashboardPage: React.FC = () => {
                                 <Bar dataKey="value" fill="#00E0C7" name="응답 수" />
                             </BarChart>
                         </ResponsiveContainer>
+                        <ChartDescription 
+                             analysis="참여자들의 직무 경력 분포를 보여줍니다. 주니어와 시니어 비중을 통해 참여자 그룹의 경험 수준을 파악하고, 맞춤형 콘텐츠를 준비하는 데 활용할 수 있습니다."
+                             checkpoint="시니어(10년 이상) 비중이 높다면, AI를 활용한 기존 업무 방식의 '혁신'과 '전략' 관점의 내용을, 주니어 비중이 높다면 '업무 자동화'와 '생산성 향상'에 초점을 맞추는 것이 효과적입니다."
+                        />
                     </div>
-                     <div>
+                     <div className="flex flex-col">
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">주요 역할 및 직무</h3>
                          <ResponsiveContainer width="100%" height={350}>
                              <PieChart>
-                                {/* FIX: Explicitly cast props to 'any' to resolve TypeScript error 'Property 'percent' does not exist on type 'Props''. The 'percent' property is calculated by Recharts and not present in the original data, causing type inference issues. */}
                                 <Pie data={analysisData.positions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }: any) => `${(percent * 100).toFixed(0)}%`}>
                                     {analysisData.positions.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -313,12 +328,15 @@ const DashboardPage: React.FC = () => {
                                 <Legend wrapperStyle={{ color: "#e2e8f0", fontSize: '14px' }} />
                             </PieChart>
                         </ResponsiveContainer>
+                        <ChartDescription
+                            analysis="참여자들의 직무 분포를 시각화하여 어떤 역할의 참여자가 많은지 한눈에 파악할 수 있습니다. 이는 강의 중 사용할 예시와 사례를 선정하는 데 중요한 기준이 됩니다."
+                            checkpoint="특정 직무 그룹(예: '현업 리더/팀장')이 다수를 차지할 경우, 해당 직무와 직접적으로 관련된 'AI를 활용한 팀원 코칭 및 성과관리' 등 별도 세션을 구성하면 만족도를 높일 수 있습니다."
+                        />
                     </div>
-                     <div>
+                     <div className="flex flex-col">
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">소속 조직 규모</h3>
                         <ResponsiveContainer width="100%" height={350}>
                             <PieChart>
-                                {/* FIX: Explicitly cast props to 'any' to resolve TypeScript error 'Property 'percent' does not exist on type 'Props''. The 'percent' property is calculated by Recharts and not present in the original data, causing type inference issues. */}
                                 <Pie data={analysisData.companySizes} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }: any) => `${(percent * 100).toFixed(0)}%`}>
                                     {analysisData.companySizes.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS.slice(2)[index % COLORS.slice(2).length]} />
@@ -328,10 +346,14 @@ const DashboardPage: React.FC = () => {
                                 <Legend wrapperStyle={{ color: "#e2e8f0", fontSize: '14px' }} />
                             </PieChart>
                         </ResponsiveContainer>
+                        <ChartDescription
+                             analysis="참여자들이 속한 조직의 규모를 통해 이들이 마주한 AI 도입 환경(자원, 정책, 문화 등)을 유추할 수 있습니다."
+                             checkpoint="대기업 참여자가 많다면 정보 보안, 내부 규정, IT 부서와의 협업 등을 강조하고, 스타트업 참여자가 많다면 비용 효율적인 무료 AI 툴 활용법과 빠른 실행 전략을 다루는 것이 좋습니다."
+                        />
                     </div>
-                     <div>
+                     <div className="flex flex-col lg:col-span-2">
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">조직 AI 정책 분포</h3>
-                        <ResponsiveContainer width="100%" height={350}>
+                        <ResponsiveContainer width="100%" height={400}>
                             <BarChart data={analysisData.aiPolicies} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                                 <CartesianGrid {...chartGridProps} />
                                 <XAxis type="number" {...chartAxisProps} />
@@ -340,58 +362,14 @@ const DashboardPage: React.FC = () => {
                                 <Bar dataKey="value" fill="#a4de6c" name="응답 수" barSize={20} />
                             </BarChart>
                         </ResponsiveContainer>
+                         <ChartDescription
+                             analysis="조직 내 AI 사용 정책의 성숙도를 보여줍니다. 참여자들이 AI를 활용하는 데 있어 제약이 많은 환경인지, 아니면 자유로운 환경인지를 가늠할 수 있습니다."
+                             checkpoint="'정책 없음'이나 '사용 금지' 응답이 많을 경우, '가이드라인이 없을 때 안전하게 AI를 사용하는 방법', '보안 우려 없이 AI를 활용하는 노하우' 등의 콘텐츠를 반드시 포함해야 합니다."
+                         />
                     </div>
-                     <div>
-                        <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">조직 내 허용 AI 도구</h3>
-                        <ResponsiveContainer width="100%" height={350}>
-                            <BarChart data={analysisData.allowedTools} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                                <CartesianGrid {...chartGridProps} />
-                                <XAxis type="number" {...chartAxisProps} />
-                                <YAxis type="category" dataKey="name" width={320} tick={{ ...chartAxisProps.tick, textAnchor: 'end' }} interval={0} />
-                                <Tooltip {...chartTooltipProps}/>
-                                <Bar dataKey="value" fill="#d0ed57" name="응답 수" barSize={20}/>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div>
-                        <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">최초 AI 사용 시기</h3>
-                        <ResponsiveContainer width="100%" height={350}>
-                             <BarChart data={analysisData.firstUseTimes} margin={{ top: 5, right: 20, left: -10, bottom: 10 }}>
-                                <CartesianGrid {...chartGridProps} />
-                                <XAxis dataKey="name" {...chartAxisProps} interval={0} />
-                                <YAxis {...chartAxisProps} />
-                                <Tooltip {...chartTooltipProps}/>
-                                <Bar dataKey="value" fill="#ffc658" name="응답 수" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                     <div>
-                        <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">개인 AI 사용 빈도</h3>
-                        <ResponsiveContainer width="100%" height={350}>
-                            <BarChart data={analysisData.usageFrequencies} margin={{ top: 5, right: 20, left: -10, bottom: 10 }}>
-                                <CartesianGrid {...chartGridProps} />
-                                <XAxis dataKey="name" {...chartAxisProps} interval={0} />
-                                <YAxis {...chartAxisProps} />
-                                <Tooltip {...chartTooltipProps}/>
-                                <Bar dataKey="value" fill="#82ca9d" name="응답 수" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                     <div>
-                        <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">주요 사용 AI 도구</h3>
-                        <ResponsiveContainer width="100%" height={350}>
-                            <BarChart data={analysisData.tools} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                                <CartesianGrid {...chartGridProps} />
-                                <XAxis type="number" {...chartAxisProps} />
-                                <YAxis type="category" dataKey="name" width={200} tick={{ ...chartAxisProps.tick, textAnchor: 'end' }} interval={0} />
-                                <Tooltip {...chartTooltipProps}/>
-                                <Bar dataKey="value" fill="#FFBB28" name="응답 수" barSize={20}/>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                     <div>
+                     <div className="flex flex-col lg:col-span-2">
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">교육 기대사항</h3>
-                         <ResponsiveContainer width="100%" height={350}>
+                         <ResponsiveContainer width="100%" height={400}>
                             <BarChart data={analysisData.expectations} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                                  <CartesianGrid {...chartGridProps} />
                                 <XAxis type="number" {...chartAxisProps} />
@@ -400,18 +378,10 @@ const DashboardPage: React.FC = () => {
                                 <Bar dataKey="value" fill="#FF8042" name="응답 수" barSize={20}/>
                             </BarChart>
                         </ResponsiveContainer>
-                    </div>
-                    <div className="lg:col-span-2">
-                        <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">개인적 해결 고민</h3>
-                         <ResponsiveContainer width="100%" height={350}>
-                            <BarChart data={analysisData.personalConcerns} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                                <CartesianGrid {...chartGridProps} />
-                                <XAxis type="number" {...chartAxisProps} />
-                                <YAxis type="category" dataKey="name" width={400} tick={{ ...chartAxisProps.tick, textAnchor: 'end' }} interval={0} />
-                                <Tooltip {...chartTooltipProps}/>
-                                <Bar dataKey="value" fill="#8884d8" name="응답 수" barSize={20}/>
-                            </BarChart>
-                        </ResponsiveContainer>
+                         <ChartDescription
+                             analysis="참여자들이 이번 교육을 통해 가장 얻고 싶어하는 내용을 직접적으로 보여주는 가장 중요한 데이터입니다. 강의 콘텐츠의 우선순위를 결정하는 핵심 기준이 됩니다."
+                             checkpoint="가장 많이 선택된 상위 2-3개 항목은 강의의 핵심 내용으로 구성하고, 강의 시작 시 '여러분께서 가장 기대해주신 이 부분을 중점적으로 다루겠다'고 언급하며 기대감을 높이는 것이 좋습니다."
+                         />
                     </div>
                  </div>
             </div>

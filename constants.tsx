@@ -102,7 +102,7 @@ export const SURVEY_QUESTIONS = [
                     // Multimodal
                     { value: 'chatgpt_paid', label: '💎 ChatGPT (유료 버전/Plus/Team/Enterprise)' },
                     { value: 'claude_paid', label: '⭐ Claude (유료 버전/Pro/Team)' },
-                    { value: 'gemini', label: '💫 Google Gemini (구 Bard)' },
+                    { value: 'gemini', label: '💫 Google Gemini' },
                     { value: 'copilot_m365', label: '🏢 Microsoft Copilot (Office 365/M365)' },
                     { value: 'notebooklm', label: '📒 Google NotebookLM' },
                     { value: 'groq', label: '⚡️ Groq' },
@@ -198,11 +198,18 @@ export const SURVEY_QUESTIONS = [
      {
         id: 'part4',
         title: 'PART 4. AI 역량 자가 진단',
-        description: '각 항목에 대해 자신의 현재 수준을 가장 잘 나타내는 점수를 선택해주세요.\n(1점: 전혀 그렇지 않다 / 2점: 거의 그렇지 않다 / 3점: 보통이다 / 4점: 어느 정도 그렇다 / 5점: 매우 그렇다)',
+        description: `각 항목은 AI를 효과적으로 활용하기 위한 핵심 역량을 의미합니다. 자신의 현재 역량 수준을 가장 잘 나타내는 점수에 솔직하게 응답해주세요. 이 결과는 교육 내용 개인화에 매우 중요하게 활용됩니다.
+
+[점수 기준]
+- 1점 (기초): 용어를 들어본 적 있으나, 의미를 설명하기 어렵고, 실제 시도해 본 경험이 거의 없는 상태.
+- 2점 (초급): 기본적인 개념을 이해하고 있으며, 가이드를 따라 간단한 작업을 수행할 수 있는 수준.
+- 3점 (중급): 관련 지식을 바탕으로 독립적인 판단이 가능하며, 일상적인 업무에 큰 문제 없이 활용하는 수준.
+- 4점 (고급): 자신의 업무 분야에서 발생하는 대부분의 문제를 해결할 수 있으며, 다른 사람에게 노하우를 전수할 수 있는 수준.
+- 5점 (전문가): 새로운 방법을 직접 찾아내거나 창조하며, 해당 분야의 발전에 기여하고, 다른 사람에게 깊은 영감을 주는 수준.`,
         questions: [
-            { id: 'understanding', label: '🧠 이해 (Understand)', description: "AI의 기본 원리, 다양한 모델(e.g., LLM, 생성형 AI)의 작동 방식, 기술적 한계와 잠재적 리스크를 이해하는 능력. (예: '환각' 현상이 왜 발생하는지 설명할 수 있다.)", type: 'rating', options: [1, 2, 3, 4, 5] },
-            { id: 'application', label: '🛠️ 활용 (Use)', description: "자신의 업무 목적에 맞는 AI 도구를 선택하고, 효과적인 프롬프트를 작성하여 원하는 결과물을 생성하며, 반복적인 업무를 자동화하는 능력. (예: 보고서 초안 작성, 데이터 요약, 이미지 생성 등을 AI로 처리할 수 있다.)", type: 'rating', options: [1, 2, 3, 4, 5] },
-            { id: 'criticalThinking', label: '🔍 비판적 사고 (Critical Thinking)', description: "AI가 생성한 결과물의 사실관계, 편향성, 윤리적 문제를 비판적으로 검토하고, 정보의 신뢰도를 판단하며, 책임감 있게 활용하는 능력. (예: AI가 만든 통계자료의 출처를 확인하고 교차 검증할 수 있다.)", type: 'rating', options: [1, 2, 3, 4, 5] },
+            { id: 'understanding', label: '🧠 이해 (Understand)', description: "AI의 기본 원리, 최신 기술 동향(e.g., LLM, 멀티모달), 비즈니스 적용 가능성과 함께 기술적 한계(e.g., 환각) 및 잠재적 리스크를 명확히 이해하고 설명하는 능력. (예시: \"RAG(검색 증강 생성)가 왜 필요한지, 기존 LLM의 한계와 어떻게 다른지 비유를 들어 설명할 수 있다.\")", type: 'rating', options: [1, 2, 3, 4, 5] },
+            { id: 'application', label: '🛠️ 활용 (Use)', description: "자신의 구체적인 업무 목적(e.g., 보고서 작성, 교육 기획, 데이터 분석)에 가장 적합한 AI 도구를 선정하고, 페르소나, 컨텍스트, 제약조건을 포함한 효과적인 프롬프트를 작성하여 기대 이상의 결과물을 생성하며, 워크플로우를 자동화하는 능력. (예시: \"여러 개의 회의록 파일을 한 번에 분석하여 핵심 요약 및 액션 아이템을 자동으로 추출하는 프롬프트를 만들 수 있다.\")", type: 'rating', options: [1, 2, 3, 4, 5] },
+            { id: 'criticalThinking', label: '🔍 비판적 사고 (Critical Thinking)', description: "AI가 생성한 결과물의 사실관계, 논리적 오류, 숨겨진 편향성, 윤리적 문제를 비판적으로 검토하고, 교차 검증을 통해 정보의 신뢰도를 판단하며, 결과물에 대한 최종 책임(Accountability)을 가지고 활용하는 능력. (예시: \"AI가 제안한 채용 면접 질문에서 특정 성별이나 연령대에 대한 편견이 포함될 가능성을 발견하고 이를 수정할 수 있다.\")", type: 'rating', options: [1, 2, 3, 4, 5] },
         ]
     },
     {
@@ -214,14 +221,14 @@ export const SURVEY_QUESTIONS = [
                 label: '11. 교육에서 가장 기대하고 듣고 싶은 콘텐츠는? (최대 3개)',
                 type: 'checkbox',
                 options: [
-                    { value: 'real_experience', label: '💡 찐 HRD 실무자의 AI 활용 철학과 실전 노하우' },
-                    { value: 'prompt_engineering', label: '⚡ HRD 업무별 맞춤형 프롬프트 엔지니어링 기법' },
-                    { value: 'security_strategy', label: '🔒 보안 제약 환경에서의 현실적이고 안전한 AI 활용 전략' },
-                    { value: 'tool_selection', label: '🛠️ AI 도구별 특징 비교와 업무 목적별 선택 가이드' },
-                    { value: 'case_studies', label: '📊 실제 HRD 프로젝트 AI 적용 성공/실패 사례 분석' },
-                    { value: 'ethics_guide', label: '⚖️ AI 윤리 및 책임감 있는 활용을 위한 실무 가이드라인' },
-                    { value: 'individual_solution', label: '🎯 개별 현업 이슈에 대한 맞춤형 AI 솔루션 제안' },
-                    { value: 'networking', label: '🤝 참가자 간 AI 활용 경험 공유 및 네트워킹 시간' },
+                    { value: 'real_experience', label: '💡 (공통) 찐 HRD 실무자의 AI 활용 철학과 실전 노하우' },
+                    { value: 'prompt_engineering', label: '⚡ (공통) 내 업무에 바로 쓰는 프롬프트 엔지니어링 실습' },
+                    { value: 'security_strategy', label: '🔒 (공통) 보안 제약 환경에서의 현실적인 AI 활용 전략' },
+                    { value: 'strategy_for_leaders', label: '🚀 (리더/기획자용) 팀/조직의 AI 도입 전략 및 구성원 역량 강화 방안' },
+                    { value: 'automation_for_practitioners', label: '⚙️ (실무자용) 반복적인 HR 실무(채용,평가 등) 자동화 사례' },
+                    { value: 'content_creation', label: '🎨 (교육/콘텐츠 담당자용) 교육 자료(이미지,영상) 제작 생산성 향상 노하우' },
+                    { value: 'case_studies', label: '📊 (공통) 실제 HRD 프로젝트 AI 적용 성공/실패 사례 분석' },
+                    { value: 'individual_solution', label: '🎯 (공통) 개별 현업 이슈에 대한 맞춤형 AI 솔루션 코칭' },
                 ],
                 maxSelection: 3
             },
@@ -250,19 +257,28 @@ export const SURVEY_QUESTIONS = [
                 id: 'main_concern',
                 label: '13. AI 활용과 관련하여 현재 가장 고민되는 이슈를 구체적으로 적어주세요 (선택사항)',
                 type: 'textarea',
-                placeholder: '예:\n• 생성형 AI가 만든 결과물의 저작권 이슈가 걱정됩니다. 어디까지 업무에 활용해도 안전한가요?\n• AI를 쓰면 쓸수록 오히려 생각하는 능력이 퇴화하는 것 같아 고민입니다.\n• 저희 팀은 AI 활용에 대한 관심이 너무 낮습니다. 어떻게 해야 동기부여를 할 수 있을까요?'
+                placeholder: `예:
+• 저희 회사는 유료 AI 툴 도입에 매우 보수적입니다. 무료 툴만으로 업무 효율을 높일 수 있는 현실적인 방법이 궁금합니다.
+• AI가 생성한 결과물의 저작권이나 정보보안 이슈 때문에 업무에 적극적으로 활용하기가 망설여집니다.
+• AI를 쓰면 쓸수록 오히려 생각하는 능력이 퇴화하는 것 같아 고민입니다. 어떻게 균형을 잡아야 할까요?`
             },
             {
                 id: 'specific_request',
                 label: '14. 본 교육과정에서 꼭 다뤄주셨으면 하는 부분이나 궁금한 점이 있다면 적어주세요 (선택사항)',
                 type: 'textarea',
-                placeholder: '예:\n• M365 코파일럿을 조직에 도입했는데, 실제 업무에서 MS 팀즈, 엑셀, 파워포인트와 연계하여 생산성을 높이는 구체적인 시나리오를 많이 보여주세요.\n• 비개발자 HR 담당자가 노코드(No-code) 툴과 AI를 결합하여 간단한 업무 자동화 시스템을 만드는 방법을 배우고 싶습니다.\n• 리더십 코칭이나 성과 피드백 상황에서 AI를 활용할 수 있는 윤리적이고 효과적인 방법이 궁금합니다.'
+                placeholder: `예:
+• M365 코파일럿을 조직에 도입했는데, 실제 HR 업무(예: 채용공고 작성, 면접 질문 생성, 직원 설문 분석)에서 바로 쓸 수 있는 시나리오 중심으로 알려주세요.
+• 비개발자 HR 담당자가 노코드(No-code) 툴과 AI를 결합하여 '채용 지원자 이력서 스크리닝 자동화' 같은 간단한 시스템을 만드는 법을 배우고 싶습니다.
+• 리더십 코칭이나 성과 피드백 상황에서 AI를 보조 도구로 활용할 때, 구성원의 신뢰를 얻을 수 있는 효과적인 소통 방법이 궁금합니다.`
             },
              {
                 id: 'personal_question',
                 label: '15. 데미안 임정훈 강사에게 개인적으로 질문하고 싶은 내용이 있다면 적어주세요 (선택사항)',
                 type: 'textarea',
-                placeholder: '예:\n• AI 기술이 빠르게 발전하는데, 어떤 정보를 기준으로 계속 학습해야 할지 막막합니다. 강사님만의 학습 비결이 궁금합니다.\n• AI 때문에 내 직무가 사라질까 불안한 마음이 듭니다. HR 전문가로서 어떻게 커리어를 개발해야 할까요?\n• 수많은 AI 뉴스 중에서 \'진짜\'와 \'과장\'을 구분하는 강사님만의 노하우는 무엇인가요?'
+                placeholder: `예:
+• AI 기술이 너무 빠르게 발전해서 따라가기 벅찹니다. HR 전문가가 놓치지 말아야 할 핵심 AI 트렌드는 무엇인가요?
+• AI 때문에 제 직무(예: 교육 운영)가 사라질까 불안합니다. 앞으로 어떤 역량을 더 개발해야 경쟁력을 가질 수 있을까요?
+• 수많은 AI 서비스 중에서 '진짜' 업무에 도움이 되는 툴과 '반짝' 유행하는 툴을 구분하는 강사님만의 기준이 궁금합니다.`
             }
         ]
     }
