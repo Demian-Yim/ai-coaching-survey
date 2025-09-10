@@ -1,16 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 import type { DiagnosisResult, SurveySubmission } from '../types';
 
+// Fix: Per Gemini API guidelines, the API key must be obtained from `process.env.API_KEY`.
+// This change also resolves the TypeScript error: "Property 'env' does not exist on type 'ImportMeta'".
 const API_KEY = process.env.API_KEY;
 
-if (!API_KEY) {
-  console.warn("API_KEY environment variable not set. Gemini API will not be available.");
+let ai: GoogleGenAI | null = null;
+if (API_KEY) {
+    ai = new GoogleGenAI({ apiKey: API_KEY });
+} else {
+    // Fix: Updated the warning message to refer to `API_KEY` instead of `VITE_API_KEY`.
+    console.warn("API_KEY environment variable not set. Please update it in your deployment settings. Gemini API features will be disabled.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
 export const generateDiagnosisFeedback = async (scores: DiagnosisResult['scores']): Promise<string> => {
-    if (!API_KEY) {
+    if (!ai) {
         return "AI 피드백은 API 키가 설정되었을 때 제공됩니다. 현재는 기본 분석 결과만 표시됩니다.";
     }
 
@@ -51,7 +55,7 @@ export const generateDiagnosisFeedback = async (scores: DiagnosisResult['scores'
 
 
 export const generateDashboardSummary = async (analysisData: any): Promise<string> => {
-    if (!API_KEY || analysisData.total === 0) {
+    if (!ai || analysisData.total === 0) {
         return "분석할 데이터가 충분하지 않거나 API 키가 설정되지 않았습니다.";
     }
 
