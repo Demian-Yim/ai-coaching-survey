@@ -54,18 +54,10 @@ export const postSurveySubmission = async (formData: any): Promise<{ id: string 
     }
 };
 
-export const deleteSubmissionById = async (id: string): Promise<{ message: string }> => {
-    // This is a mock implementation. In a real scenario, this would make a DELETE request.
-    console.log(`Simulating delete for submission ID: ${id}`);
-    // For real implementation:
-    // return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteById&id=${id}`, { method: 'POST' }); // Using POST for GAS compatibility
-     return Promise.resolve({ message: `Successfully deleted submission ${id}` });
+export const deleteSubmissionById = (id: string): Promise<{ message: string }> => {
+    return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteById&id=${id}`, { method: 'POST' });
 };
 
-export const deleteAllSubmissions = async (): Promise<{ message: string }> => {
-    // This is a mock implementation.
-    console.log('Simulating delete for all submissions.');
-    // For real implementation:
-    // return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteAll`, { method: 'POST' }); // Using POST for GAS compatibility
-    return Promise.resolve({ message: 'All submissions successfully deleted' });
+export const deleteAllSubmissions = (): Promise<{ message: string }> => {
+    return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteAll`, { method: 'POST' });
 };
