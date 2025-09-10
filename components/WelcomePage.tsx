@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -42,7 +43,7 @@ const WelcomePage: React.FC = () => {
                     <div className="flex-shrink-0">
                         <div className="relative inline-block">
                             <div className="p-1.5 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-500 neon-glow">
-                                 <img src={imageUrl} alt="데미안 임정훈 강사" className="w-48 h-48 rounded-full object-cover border-4 border-slate-800" />
+                                 <img src={imageUrl} alt="데미안 임정훈 강사" className="w-48 h-48 rounded-full object-cover" />
                             </div>
                         </div>
                     </div>
@@ -52,9 +53,12 @@ const WelcomePage: React.FC = () => {
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-100 mb-2">
                             <span role="img" aria-label="waving hand">👋</span> 반갑습니다!
                         </h2>
-                        <p className="text-slate-300 text-2xl md:text-3xl mb-4 font-semibold">데미안 임정훈입니다.</p>
+                        <p className="text-slate-300 text-2xl md:text-3xl mb-4 font-semibold">데미안 임정훈 코치 입니다.</p>
                         <p className="text-slate-400 text-lg md:text-xl leading-relaxed max-w-lg">
-                            실무에서 정말 바로 써먹을 수 있는 AI 활용법과 현업 이슈 해결 과정을 전하고, 진짜 이야기를 나누어 보아요~ <span role="img" aria-label="rocket">🚀</span>
+                            실무에서 정말 바로 써먹을 수 있는 AI 활용법과 <br/>
+                            현업 이슈 해결해 나아가는 진짜 이야기를 <br/>
+                            함께 나누려고 합니다. <br/>
+                            고맙습니다~ <span role="img" aria-label="rocket">🚀</span>
                         </p>
                     </div>
                 </div>

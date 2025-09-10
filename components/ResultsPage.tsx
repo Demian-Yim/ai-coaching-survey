@@ -5,7 +5,66 @@ import { downloadResultsAsPDF } from '../services/pdfService';
 import { fetchSubmissionById } from '../services/dataService';
 import type { DiagnosisResult } from '../types';
 import Spinner from './common/Spinner';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+
+// --- Qualitative Analysis Data ---
+
+const LEVELS = [
+    { name: '😊 탐험가', range: [1.0, 2.5], description: 'AI의 세계를 탐험하기 시작한 단계입니다.\n기본 개념을 익히고 간단한 AI 도구 사용법을 배우는 시기입니다.' },
+    { name: '🙌 활용자', range: [2.6, 3.5], description: 'AI를 일상과 업무에 활용하고 있습니다.\n다양한 도구를 시도하고 결과를 검증하는 습관을 기르면 좋습니다.' },
+    { name: '🌟 전문가', range: [3.6, 4.2], description: 'AI를 창의적으로 활용하는 전문가입니다.\n팀 내 AI 활용을 선도하고 복잡한 문제 해결에 AI를 적용합니다.' },
+    { name: '🚀 혁신가', range: [4.3, 5.0], description: 'AI로 새로운 가치를 창출하는 혁신가입니다.\n조직의 AI 전환을 주도하고 미래 전략을 수립합니다.' },
+];
+
+const PROFILES = {
+    '균형형': { description: '모든 영역에서 고른 점수 분포', suggestion: '가장 관심 있는 영역을 선택해 심화 발전' },
+    '실행형': { description: '활용 능력은 높으나 이론/윤리 부족', suggestion: '이론적 배경과 윤리적 고려사항 보강' },
+    '이론형': { description: '개념 이해는 높으나 실제 활용 부족', suggestion: '실습과 프로젝트 기반 학습 권장' },
+    '미래형': { description: '성장/적응력 높으나 현 활용 부족', suggestion: '현재 활용 가능한 도구 집중 실습' },
+};
+
+const GROWTH_SUGGESTIONS = {
+    '😊 탐험가': [
+        '**온라인 강의나 도서**를 통해 AI 기초 원리를 학습하고, 매일 10분씩 ChatGPT와 대화하며 AI와 친해져보세요.',
+        '**스터디 그룹이나 사내 커뮤니티**에 참여하여 동료들과 AI 활용 팁을 공유하고 함께 성장하는 학습 파트너를 찾아보세요.',
+        '본 교육과정에서 제공되는 **맞춤형 AI 코칭**을 통해 궁금증을 해결하고, 개인화된 학습 경로를 설계받는 것을 추천합니다.'
+    ],
+    '🙌 활용자': [
+        '자신의 직무에 특화된 **‘나만의 프롬프트 라이브러리’**를 구축하고, 동료들과 공유하며 고도화시켜보세요.',
+        '이미지 생성, 데이터 분석 등 특정 목적의 AI 툴을 1~2개 정해 깊이 있게 학습하는 **심화 과정**에 참여해보세요.',
+        '**전문가 코칭**을 통해 현재 업무 프로세스를 AI로 혁신하는 개인 프로젝트를 진행하며 실질적인 성공 사례를 만들어보세요.'
+    ],
+    '🌟 전문가': [
+        '팀 내 **‘AI 활용 사례 공유회’**를 정기적으로 주최하고, 구성원들을 돕는 **‘AI 챔피언’** 역할을 수행하며 리더십을 발휘하세요.',
+        '외부 전문가 커뮤니티나 컨퍼런스에 참여하여 최신 트렌드를 학습하고, 이를 조직에 내재화하는 방안을 모색하세요.',
+        '**리더십 코칭**을 통해 팀의 AI 도입 전략을 수립하고, 조직 내에서 자신의 영향력을 확대하는 방법을 학습할 수 있습니다.'
+    ],
+    '🚀 혁신가': [
+        '조직의 비전과 연계된 **‘AI Transformation 로드맵’**을 수립하고, 경영진을 설득하여 전사적인 지원을 확보하세요.',
+        'AI를 활용한 신규 비즈니스 모델을 기획하고 **PoC(Proof of Concept) 프로젝트**를 리딩하며 아이디어를 현실로 만드세요.',
+        '최고 수준의 **전문가 코칭 및 컨설팅**을 통해 기술적 통찰력을 비즈니스 전략으로 전환하고 조직 전체의 변화를 이끌어보세요.'
+    ],
+};
+
+// --- Helper Functions ---
+
+const getUserLevel = (score: number) => {
+    return LEVELS.find(l => score >= l.range[0] && score <= l.range[1]) || LEVELS[0];
+};
+
+const getUserProfile = (scores: { understanding: number; application: number; criticalThinking: number; }) => {
+    const { understanding, application, criticalThinking } = scores;
+    const scoreValues = Object.values(scores);
+    const maxScore = Math.max(...scoreValues);
+    const minScore = Math.min(...scoreValues);
+    const diff = maxScore - minScore;
+
+    if (diff <= 1.0) return '균형형';
+    if (application === maxScore && application - minScore > 1.0) return '실행형';
+    if (understanding === maxScore && understanding - application > 1.0) return '이론형';
+    if (criticalThinking === maxScore && criticalThinking - application > 1.0) return '미래형';
+    return '균형형'; // Default case
+};
+
 
 const ResultsPage: React.FC = () => {
     const { userId } = useParams<{ userId: string }>();
@@ -55,13 +114,15 @@ const ResultsPage: React.FC = () => {
         getResultData();
     }, [userId]);
 
-    const chartData = useMemo(() => {
-        if (!result) return [];
-        return [
-            { subject: '이해', score: result.scores.understanding, fullMark: 5 },
-            { subject: '활용', score: result.scores.application, fullMark: 5 },
-            { subject: '비판적 사고', score: result.scores.criticalThinking, fullMark: 5 },
-        ];
+    const qualitativeData = useMemo(() => {
+        if (!result) return null;
+        
+        const level = getUserLevel(result.overall);
+        const profileKey = getUserProfile(result.scores);
+        const profile = PROFILES[profileKey as keyof typeof PROFILES];
+        const suggestions = GROWTH_SUGGESTIONS[level.name as keyof typeof GROWTH_SUGGESTIONS];
+        
+        return { level, profile: { name: profileKey, ...profile }, suggestions };
     }, [result]);
 
     const handleDownloadPDF = async () => {
@@ -72,11 +133,9 @@ const ResultsPage: React.FC = () => {
         const rootEl = document.getElementById('results-content');
         const originalBg = document.body.style.backgroundColor;
 
-        // Temporarily switch to a light theme for PDF export for better printing
         document.body.style.backgroundColor = '#ffffff';
         if (rootEl) rootEl.classList.add('pdf-light-theme');
         
-        // Wait for styles to apply
         await new Promise(resolve => setTimeout(resolve, 100));
 
         try {
@@ -84,7 +143,6 @@ const ResultsPage: React.FC = () => {
         } catch (error) {
             console.error("PDF Download failed", error);
         } finally {
-            // Revert to dark theme
             if (rootEl) rootEl.classList.remove('pdf-light-theme');
             document.body.style.backgroundColor = originalBg;
             setIsDownloadingPdf(false);
@@ -95,11 +153,10 @@ const ResultsPage: React.FC = () => {
         return <div className="text-center p-10"><Spinner /></div>;
     }
 
-    if (!result) {
+    if (!result || !qualitativeData) {
         return <div className="text-center text-2xl font-bold p-10 bg-slate-800/50 rounded-lg shadow-md border border-slate-700">진단 결과를 찾을 수 없습니다.</div>;
     }
     
-    // A little hack to make PDF export background white and text dark
     const pdfStyles = `
         .pdf-light-theme, .pdf-light-theme > div {
             background-color: #ffffff !important;
@@ -108,12 +165,6 @@ const ResultsPage: React.FC = () => {
         }
         .pdf-light-theme h1, .pdf-light-theme h2, .pdf-light-theme p, .pdf-light-theme strong, .pdf-light-theme span, .pdf-light-theme li {
              color: #1e293b !important;
-        }
-        .pdf-light-theme .recharts-text {
-            fill: #1e293b !important;
-        }
-        .pdf-light-theme .pdf-score-card {
-            background-color: #f1f5f9 !important;
         }
         .pdf-light-theme .text-cyan-400 { color: #0891b2 !important; }
         .pdf-light-theme .text-transparent { color: #1e293b !important; }
@@ -124,6 +175,7 @@ const ResultsPage: React.FC = () => {
         }
          .pdf-light-theme .pdf-explanation-card {
             background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
         }
     `;
 
@@ -135,44 +187,42 @@ const ResultsPage: React.FC = () => {
                     <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-300">{result.submissionData.responses.name}님의 AI 역량 진단 리포트</h1>
                     <p className="text-slate-400 mt-2">{new Date(result.submissionData.timestamp).toLocaleString('ko-KR')} 기준</p>
                 </div>
-
-                <div className="grid md:grid-cols-5 gap-8 items-center">
-                    <div className="md:col-span-3 h-80 md:h-96">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-                                <PolarGrid stroke="#475569" />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8' }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 5]} tickCount={6} stroke="#475569" tick={{ fill: '#94a3b8' }} />
-                                <Radar name={`${result.submissionData.responses.name}님`} dataKey="score" stroke="#22d3ee" fill="#06b6d4" fillOpacity={0.6} />
-                                <Legend wrapperStyle={{ color: "#e2e8f0" }} />
-                                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }} />
-                            </RadarChart>
-                        </ResponsiveContainer>
+                
+                <div className="pt-8 border-t border-slate-700">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🏆 당신의 AI 활용 수준</h2>
+                    <div className="bg-slate-800/50 p-8 rounded-lg text-center border border-slate-700 pdf-explanation-card">
+                        <p className="text-4xl font-bold text-cyan-400 mb-4">{qualitativeData.level.name}</p>
+                        <p className="text-slate-300 text-lg whitespace-pre-line leading-relaxed">{qualitativeData.level.description}</p>
                     </div>
-                    <div className="md:col-span-2 text-center bg-slate-800/50 p-6 rounded-lg border border-slate-700 pdf-score-card">
-                        <h2 className="text-2xl font-bold text-slate-200 mb-3">종합 역량 점수</h2>
-                        <p className="text-6xl font-bold text-cyan-400 mb-4">{result.overall.toFixed(1)} <span className="text-2xl text-slate-400">/ 5.0</span></p>
-                        <div className="space-y-2 text-lg text-left inline-block text-slate-300">
-                            <p><strong>🧠 이해:</strong> <span className="font-bold text-white">{result.scores.understanding}점</span></p>
-                            <p><strong>🛠️ 활용:</strong> <span className="font-bold text-white">{result.scores.application}점</span></p>
-                            <p><strong>🔍 비판적 사고:</strong> <span className="font-bold text-white">{result.scores.criticalThinking}점</span></p>
+                </div>
+
+                <div className="pt-8 border-t border-slate-700">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">📈 영역별 역량 프로필</h2>
+                    <div className="bg-slate-800/50 p-8 rounded-lg border border-slate-700 grid md:grid-cols-2 gap-8 items-center pdf-explanation-card">
+                        <div className="text-center">
+                            <p className="text-xl text-slate-400">프로필 유형</p>
+                            <p className="text-3xl font-bold text-white mt-2">{qualitativeData.profile.name}</p>
+                        </div>
+                        <div className="text-lg text-center md:text-left">
+                            <p className="font-semibold text-slate-200"><strong>특징:</strong> {qualitativeData.profile.description}</p>
+                            <p className="font-semibold text-slate-200 mt-3"><strong>발전 제안:</strong> <span className="text-cyan-300">{qualitativeData.profile.suggestion}</span></p>
                         </div>
                     </div>
                 </div>
-                 
+
                 <div className="pt-8 border-t border-slate-700">
-                    <h2 className="text-2xl font-bold text-slate-200 mb-4">💡 영역별 해설</h2>
-                    <div className="bg-slate-800/50 p-6 rounded-lg space-y-4 text-slate-300 border border-slate-700 pdf-explanation-card">
-                        <p><strong>🧠 이해 (Understand): {result.scores.understanding}점</strong><br />AI의 기본 원리, 가능성과 한계에 대한 이해 수준을 의미합니다.</p>
-                        <p><strong>🛠️ 활용 (Use): {result.scores.application}점</strong><br />업무 목적에 맞게 AI 도구를 능숙하고 효율적으로 사용하는 능력을 의미합니다.</p>
-                        <p><strong>🔍 비판적 사고 (Critical Thinking): {result.scores.criticalThinking}점</strong><br />AI가 생성한 결과물의 신뢰성, 편향성, 윤리적 문제를 판단하는 능력을 의미합니다.</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🌱 다음 단계를 위한 맞춤형 성장 제안</h2>
+                    <div className="bg-slate-800/50 p-8 rounded-lg border border-slate-700 pdf-explanation-card">
+                        <ul className="space-y-4 list-disc list-inside text-slate-300 text-lg">
+                            {qualitativeData.suggestions.map((item, index) => <li key={index} dangerouslySetInnerHTML={{ __html: item }} />)}
+                        </ul>
                     </div>
                 </div>
 
                 <div className="pt-8 border-t border-slate-700">
-                    <h2 className="text-2xl font-bold text-slate-200 mb-4">🤖 AI 생성 맞춤 분석 및 제언</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🤖 AI 생성 맞춤 분석 및 제언</h2>
                      {isLoading ? <Spinner /> : (
-                        <div className="bg-blue-900/30 p-6 rounded-lg whitespace-pre-wrap text-base text-blue-200 leading-relaxed border border-blue-500/50 pdf-feedback-card">
+                        <div className="bg-blue-900/30 p-8 rounded-lg whitespace-pre-wrap text-base text-blue-200 leading-relaxed border border-blue-500/50 pdf-feedback-card">
                             {result?.feedback}
                         </div>
                     )}

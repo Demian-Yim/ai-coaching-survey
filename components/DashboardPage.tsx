@@ -303,7 +303,8 @@ const DashboardPage: React.FC = () => {
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">주요 역할 및 직무</h3>
                          <ResponsiveContainer width="100%" height={350}>
                              <PieChart>
-                                <Pie data={analysisData.positions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
+                                {/* FIX: Explicitly cast props to 'any' to resolve TypeScript error 'Property 'percent' does not exist on type 'Props''. The 'percent' property is calculated by Recharts and not present in the original data, causing type inference issues. */}
+                                <Pie data={analysisData.positions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }: any) => `${(percent * 100).toFixed(0)}%`}>
                                     {analysisData.positions.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
@@ -317,7 +318,8 @@ const DashboardPage: React.FC = () => {
                         <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">소속 조직 규모</h3>
                         <ResponsiveContainer width="100%" height={350}>
                             <PieChart>
-                                <Pie data={analysisData.companySizes} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
+                                {/* FIX: Explicitly cast props to 'any' to resolve TypeScript error 'Property 'percent' does not exist on type 'Props''. The 'percent' property is calculated by Recharts and not present in the original data, causing type inference issues. */}
+                                <Pie data={analysisData.companySizes} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }: any) => `${(percent * 100).toFixed(0)}%`}>
                                     {analysisData.companySizes.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS.slice(2)[index % COLORS.slice(2).length]} />
                                     ))}
