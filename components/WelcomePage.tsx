@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const WelcomePage: React.FC = () => {
-    const imageUrl = "https://raw.githubusercontent.com/Demian-Yim/ai-coaching-survey/main/%ED%94%84%EB%A1%9C%ED%95%84_%EB%8D%B0%EB%AF%B8%EC%95%88.jpg";
-    const videoUrl = "https://raw.githubusercontent.com/Demian-Yim/ai-coaching-survey/main/A_bright_refreshing_202508211752_r800k.mp4";
+    const imageUrl = "https://raw.githubusercontent.com/Demian-Yim/db/Hompage/%ED%94%84%EB%A1%9C%ED%95%84_%EB%8D%B0%EB%AF%B8%EC%95%88.png";
+    const videoUrl = "https://raw.githubusercontent.com/Demian-Yim/db/Hompage/A_bright_refreshing_202508211752_r800k.mp4";
 
     return (
         <div className="space-y-12 md:space-y-16 py-8">
@@ -19,23 +19,6 @@ const WelcomePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Instructor Intro Section */}
-            <div className="max-w-2xl mx-auto text-center bg-slate-900/70 backdrop-blur-sm border border-cyan-500/30 p-10 rounded-2xl shadow-2xl">
-                <div className="relative inline-block mb-8">
-                    <div className="p-1.5 rounded-full bg-gradient-to-tr from-cyan-400 via-pink-500 to-yellow-400 neon-glow-profile">
-                         <img src={imageUrl} alt="데미안 임정훈 강사" className="w-40 h-40 rounded-full object-cover border-4 border-slate-800" />
-                    </div>
-                </div>
-                
-                <h2 className="text-3xl font-bold text-slate-100 mb-4">
-                    <span role="img" aria-label="waving hand">👋</span> 반갑습니다!
-                </h2>
-                <p className="text-slate-300 text-2xl mb-4 font-semibold">데미안 임정훈입니다.</p>
-                <p className="text-slate-400 text-xl leading-relaxed max-w-md mx-auto">
-                    실무에서 정말 바로 써먹을 수 있는 AI 활용법과 현업 이슈 해결 과정을 전하고, 진짜 이야기를 나누고 보아요~ <span role="img" aria-label="rocket">🚀</span>
-                </p>
-            </div>
-            
             {/* Video Section */}
             <div className="max-w-4xl mx-auto text-center">
                  <div className="bg-slate-900/70 backdrop-blur-sm border border-cyan-500/30 p-2 rounded-2xl shadow-2xl">
@@ -52,6 +35,31 @@ const WelcomePage: React.FC = () => {
                  </div>
             </div>
 
+            {/* Instructor Intro Section */}
+            <div className="max-w-4xl mx-auto bg-slate-900/70 backdrop-blur-sm border border-cyan-500/30 p-10 rounded-2xl shadow-2xl">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-12">
+                    {/* Image Section */}
+                    <div className="flex-shrink-0">
+                        <div className="relative inline-block">
+                            <div className="p-1.5 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-500 neon-glow">
+                                 <img src={imageUrl} alt="데미안 임정훈 강사" className="w-48 h-48 rounded-full object-cover border-4 border-slate-800" />
+                            </div>
+                        </div>
+                    </div>
+            
+                    {/* Text Section */}
+                    <div className="text-center md:text-left">
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-100 mb-2">
+                            <span role="img" aria-label="waving hand">👋</span> 반갑습니다!
+                        </h2>
+                        <p className="text-slate-300 text-2xl md:text-3xl mb-4 font-semibold">데미안 임정훈입니다.</p>
+                        <p className="text-slate-400 text-lg md:text-xl leading-relaxed max-w-lg">
+                            실무에서 정말 바로 써먹을 수 있는 AI 활용법과 현업 이슈 해결 과정을 전하고, 진짜 이야기를 나누어 보아요~ <span role="img" aria-label="rocket">🚀</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
             {/* Call to Action */}
             <div className="max-w-4xl mx-auto text-center bg-slate-800/60 backdrop-blur-sm border border-cyan-500/30 p-10 rounded-2xl shadow-xl">
                  <h2 className="text-3xl font-bold text-slate-100 mb-4">최적의 학습 경험을 위해, 먼저 진단해주세요!</h2>
