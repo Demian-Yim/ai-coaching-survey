@@ -59,7 +59,7 @@ export const generateDashboardSummary = async (analysisData: any): Promise<strin
         return "분석할 데이터가 충분하지 않거나 API 키가 설정되지 않았습니다.";
     }
 
-    const { total, avgCapability, positions, aiPolicies, tools, experiences } = analysisData;
+    const { total, avgCapability, jobRoles, aiPolicies, tools, experiences } = analysisData;
 
     const prompt = `
         당신은 데이터 분석가이자 교육 컨설턴트입니다. 
@@ -71,7 +71,7 @@ export const generateDashboardSummary = async (analysisData: any): Promise<strin
         - 평균 '비판적 사고' 점수: ${avgCapability.find((d: any) => d.name === '비판적 사고')?.score || 'N/A'}
 
         **2. 참여자 특성**
-        - 직책 분포: ${positions.map((p: any) => `${p.name}: ${p.value}명`).join(', ')}
+        - 역할 분포: ${jobRoles.map((p: any) => `${p.name}: ${p.value}명`).join(', ')}
         - 조직 AI 정책: ${aiPolicies.map((p: any) => `${p.name}: ${p.value}명`).join(', ')}
         - 자주 쓰는 AI 툴: ${tools.map((t: any) => `${t.name}: ${t.value}명`).join(', ')}
         - HR 경력: ${experiences.map((e: any) => `${e.name}: ${e.value}명`).join(', ')}

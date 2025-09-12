@@ -76,10 +76,25 @@ const SurveyPage: React.FC = () => {
                         {'description' in section && section.description && <p className="text-slate-400 mb-6 whitespace-pre-line">{section.description}</p>}
                         
                         <div className="space-y-6">
-                            {section.questions.map(q => (
-                                <div key={q.id} className="bg-slate-900/70 p-4 rounded-md shadow-sm border border-slate-800">
-                                    <label htmlFor={q.id} className="block text-lg font-medium text-slate-200 mb-2">{q.label} {q.required && <span className="text-red-500">*</span>}</label>
-                                    {q.description && <p className="text-sm text-slate-400 mb-3">{q.description}</p>}
+                            {section.questions.map(q => {
+                                const descriptionParts = q.description ? q.description.split('(예시:') : [];
+                                const mainDescription = descriptionParts[0];
+                                const exampleText = descriptionParts.length > 1 ? `(예시: ${descriptionParts[1]}` : '';
+
+                                return (
+                                <div key={q.id} className="bg-slate-900/70 p-5 rounded-lg shadow-sm border border-slate-800">
+                                    <label htmlFor={q.id} className="block text-lg font-medium text-slate-200 mb-3">{q.label} {q.required && <span className="text-red-500">*</span>}</label>
+                                    
+                                    {q.type === 'rating' && q.description && (
+                                         <div className="bg-slate-800/60 p-4 rounded-md border border-slate-700 mb-4">
+                                            <p className="text-base text-slate-300 whitespace-pre-line leading-relaxed">
+                                                {mainDescription}
+                                                {exampleText && <span className="block mt-3 text-cyan-200/80 italic">{exampleText}</span>}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {q.type !== 'rating' && q.description && <p className="text-sm text-slate-400 mb-3">{q.description}</p>}
                                     
                                     {q.type === 'multi-text' && q.fields && (
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -150,7 +165,7 @@ const SurveyPage: React.FC = () => {
                                     )}
                                     
                                     {(q.type === 'radio' || q.type === 'checkbox') && (
-                                        <div className="space-y-2">
+                                        <div className="space-y-3">
                                             {q.options?.map(opt => {
                                                 const isChecked = q.type === 'checkbox' 
                                                     ? (formData[q.id] || []).includes(opt.value)
@@ -201,7 +216,7 @@ const SurveyPage: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-                            ))}
+                            )})}
                         </div>
                     </div>
                 ))}

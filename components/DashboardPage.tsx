@@ -94,8 +94,8 @@ const DashboardPage: React.FC = () => {
             const { options } = question;
         
             if (options.length > 0 && typeof options[0] === 'object' && options[0] !== null) {
-                return (options as ReadonlyArray<{ value: string; label: string }>).reduce((acc: Record<string, string>, opt) => {
-                    acc[opt.value] = opt.label;
+                return (options as ReadonlyArray<{ value: string; label: string; hasTextInput?: boolean }>).reduce((acc: Record<string, string>, opt) => {
+                    acc[opt.value] = opt.hasTextInput ? opt.label.replace(' (직접 입력)', '') : opt.label;
                     return acc;
                 }, {});
             }
@@ -106,8 +106,12 @@ const DashboardPage: React.FC = () => {
         const createCounts = (key: string) => {
             const labels = getOptionsMap(key);
             return displayedSubmissions.reduce((acc, sub) => {
-                const value = sub.responses[key];
-                if (value) {
+                let value = sub.responses[key];
+                if (value === 'other') {
+                    const otherText = sub.responses[`${key}_other_text`];
+                    value = otherText ? `기타: ${otherText}` : '기타';
+                    acc[value] = (acc[value] || 0) + 1;
+                } else if (value) {
                     const name = labels[value] || value;
                     acc[name] = (acc[name] || 0) + 1;
                 }
@@ -153,7 +157,8 @@ const DashboardPage: React.FC = () => {
                 { name: '활용', score: parseFloat((capabilityScores.application / total).toFixed(1)) },
                 { name: '비판적 사고', score: parseFloat((capabilityScores.criticalThinking / total).toFixed(1)) },
             ],
-            positions: formatChartData(createCounts('role')),
+            jobFunctions: formatChartData(createCounts('job_function')),
+            jobRoles: formatChartData(createCounts('job_role')),
             companySizes: formatChartData(createCounts('company_size')),
             aiPolicies: formatChartData(createCounts('ai_policy')),
             allowedTools: formatChartData(createMultiCounts('allowed_tools')),
@@ -168,7 +173,7 @@ const DashboardPage: React.FC = () => {
         const summaryPayload = {
             total: fullAnalysis.total,
             avgCapability: fullAnalysis.avgCapability,
-            positions: fullAnalysis.positions,
+            jobRoles: fullAnalysis.jobRoles,
             aiPolicies: fullAnalysis.aiPolicies,
             tools: fullAnalysis.tools.slice(0, 5),
             experiences: fullAnalysis.experiences,
@@ -265,11 +270,27 @@ const DashboardPage: React.FC = () => {
              }
         });
 
-        const columnKeys = SURVEY_QUESTIONS.flatMap(s => s.questions.flatMap(q => q.type === 'multi-text' ? (q.fields?.map(f => f.id) || []) : [q.id]));
-        const headers = columnKeys.map(key => questionMap.get(key)?.label || key);
+        const columnKeysWithOther = SURVEY_QUESTIONS.flatMap(s => s.questions.flatMap(q => {
+            const baseKeys = q.type === 'multi-text' ? (q.fields?.map(f => f.id) || []) : [q.id];
+            if (q.type === 'radio' && q.options?.some(opt => 'hasTextInput' in opt && opt.hasTextInput)) {
+                return [...baseKeys, `${q.id}_other_text`];
+            }
+            return baseKeys;
+        }));
+        
+        const uniqueColumnKeys = [...new Set(columnKeysWithOther)];
+
+        const headers = uniqueColumnKeys.map(key => {
+            if (key.endsWith('_other_text')) {
+                const baseKey = key.replace('_other_text', '');
+                const baseLabel = questionMap.get(baseKey)?.label || baseKey;
+                return `${baseLabel} (기타)`;
+            }
+            return questionMap.get(key)?.label || key;
+        });
 
         const rows = displayedSubmissions.map(sub => {
-            return columnKeys.map(key => {
+            return uniqueColumnKeys.map(key => {
                 const val = sub.responses[key];
                 let displayValue = '';
                 
@@ -356,7 +377,7 @@ const DashboardPage: React.FC = () => {
                     <StatCard title="평균 '종합' 점수" value={((analysisData.avgCapability[0].score + analysisData.avgCapability[1].score + analysisData.avgCapability[2].score)/3).toFixed(1)} />
                 </div>
 
-                <div className="bg-slate-800/50 p-8 rounded-xl shadow-lg border border-slate-700">
+                <div className="bg-gradient-to-br from-slate-800/70 to-slate-900/80 p-8 rounded-2xl shadow-xl border border-cyan-500/50 neon-glow">
                      <h2 className="text-3xl font-bold mb-4 text-cyan-300">🤖 AI 생성 인사이트</h2>
                      {isLoadingSummary ? <Spinner/> : (
                         <div className="bg-blue-900/30 p-6 rounded-lg whitespace-pre-wrap text-lg leading-relaxed text-blue-200 border border-blue-500/50">
@@ -365,7 +386,7 @@ const DashboardPage: React.FC = () => {
                      )}
                 </div>
 
-                <div className="bg-slate-800/50 p-8 rounded-xl shadow-lg border border-slate-700">
+                <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/70 p-8 rounded-2xl shadow-xl border border-slate-700">
                     <h2 className="text-3xl font-bold mb-8 text-center text-slate-200">📊 세부 문항별 분석</h2>
                     <div className="grid lg:grid-cols-2 gap-x-16 gap-y-12">
                          <div className="flex flex-col">
@@ -401,12 +422,12 @@ const DashboardPage: React.FC = () => {
                                  checkpoint="시니어(10년 이상) 비중이 높다면, AI를 활용한 기존 업무 방식의 '혁신'과 '전략' 관점의 내용을, 주니어 비중이 높다면 '업무 자동화'와 '생산성 향상'에 초점을 맞추는 것이 효과적입니다."
                             />
                         </div>
-                         <div className="flex flex-col">
-                            <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">주요 역할 및 직무</h3>
+                        <div className="flex flex-col">
+                            <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">핵심 직무(Function)</h3>
                              <ResponsiveContainer width="100%" height={350}>
                                  <PieChart>
-                                    <Pie data={analysisData.positions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }: any) => `${(percent * 100).toFixed(0)}%`}>
-                                        {analysisData.positions.map((entry, index) => (
+                                    <Pie data={analysisData.jobFunctions} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} labelLine={false} label={({ name, percent }: any) => `${(percent * 100).toFixed(0)}%`}>
+                                        {analysisData.jobFunctions.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
@@ -415,8 +436,24 @@ const DashboardPage: React.FC = () => {
                                 </PieChart>
                             </ResponsiveContainer>
                             <ChartDescription
-                                analysis="참여자들의 직무 분포를 시각화하여 어떤 역할의 참여자가 많은지 한눈에 파악할 수 있습니다. 이는 강의 중 사용할 예시와 사례를 선정하는 데 중요한 기준이 됩니다."
-                                checkpoint="특정 직무 그룹(예: '현업 리더/팀장')이 다수를 차지할 경우, 해당 직무와 직접적으로 관련된 'AI를 활용한 팀원 코칭 및 성과관리' 등 별도 세션을 구성하면 만족도를 높일 수 있습니다."
+                                analysis="참여자들의 핵심 직무 분포를 통해 그룹의 전문성을 파악합니다. HR 관련 직무가 많은지, 다양한 직무가 섞여 있는지 확인하여 강의 예시를 맞춤화할 수 있습니다."
+                                checkpoint="특정 직무 그룹이 다수일 경우, 해당 직무의 Pain Point를 해결해주는 AI 활용 사례를 중심으로 실습을 구성하면 몰입도를 높일 수 있습니다."
+                            />
+                        </div>
+                         <div className="flex flex-col">
+                            <h3 className="text-2xl font-bold mb-6 text-center text-slate-300">주된 역할(Role)</h3>
+                            <ResponsiveContainer width="100%" height={350}>
+                                <BarChart data={analysisData.jobRoles} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                    <CartesianGrid {...chartGridProps} />
+                                    <XAxis dataKey="name" {...chartAxisProps} />
+                                    <YAxis {...chartAxisProps} />
+                                    <Tooltip {...chartTooltipProps}/>
+                                    <Bar dataKey="value" fill="#FFBB28" name="응답 수" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                            <ChartDescription
+                                analysis="참여자들의 주된 역할을 통해 리더 그룹과 실무자 그룹의 비중을 파악합니다. 이는 강의의 난이도와 초점을 조절하는 데 중요한 정보가 됩니다."
+                                checkpoint="리더 그룹의 비중이 높다면 '팀 생산성 향상'과 'AI 도입 전략'을, 실무자 그룹 비중이 높다면 '개인 업무 자동화'와 '보고서 작성 팁' 등 구체적인 스킬 중심으로 내용을 구성하는 것이 효과적입니다."
                             />
                         </div>
                          <div className="flex flex-col">
@@ -472,7 +509,7 @@ const DashboardPage: React.FC = () => {
                      </div>
                 </div>
                 
-                <div className="bg-slate-800/50 p-8 rounded-xl shadow-lg border border-slate-700">
+                <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/70 p-8 rounded-2xl shadow-xl border border-slate-700">
                     <h2 className="text-3xl font-bold mb-8 text-center text-slate-200">📝 서술형 응답 모아보기</h2>
                     <div className="space-y-10">
                         {freeTextQuestions.map(question => {
@@ -496,7 +533,7 @@ const DashboardPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-slate-800/50 p-8 rounded-xl shadow-lg border border-slate-700">
+                <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/70 p-8 rounded-2xl shadow-xl border border-slate-700">
                     <h2 className="text-3xl font-bold mb-6 text-slate-200">👥 참여자별 제출 현황</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-base">

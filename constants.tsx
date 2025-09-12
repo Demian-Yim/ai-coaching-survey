@@ -14,7 +14,7 @@ export const SURVEY_QUESTIONS = [
             {
                 id: 'laptop_year',
                 label: '2. 노트북 제품 연식 또는 구매 연도를 선택해주세요.',
-                type: 'select',
+                type: 'radio',
                 required: true,
                 options: [
                     { value: '2025', label: '2025년' },
@@ -27,27 +27,44 @@ export const SURVEY_QUESTIONS = [
                     { value: '2018_before', label: '2018년 이전' },
                 ]
             },
-            { 
-                id: 'role', 
-                label: '3. 주요 역할 및 직무를 선택해주세요', 
-                type: 'select', 
+            {
+                id: 'job_function',
+                label: '3. 귀하의 핵심 직무(Function)를 선택해주세요',
+                type: 'radio',
                 required: true,
                 options: [
-                    { value: 'hrd_planning_strategy', label: 'HRD (교육기획/전략)' },
-                    { value: 'hrd_operation', label: 'HRD (교육운영/실무)' },
-                    { value: 'hr_generalist', label: 'HR (인사기획/제도/채용/평가/보상)' },
-                    { value: 'org_development_culture', label: '조직개발/조직문화' },
-                    { value: 'leadership_coaching', label: '리더십개발/코칭/퍼실리테이션' },
-                    { value: 'executive', label: '경영진/임원' },
-                    { value: 'team_leader', label: '현업 리더/팀장' },
-                    { value: 'external_expert', label: '외부 컨설턴트/강사/코치' },
-                    { value: 'freelancer_one_person_company', label: '1인 기업/프리랜서' },
-                    { value: 'other', label: '기타' },
-                ] 
+                    { value: 'hrd', label: 'HRD (인재개발/교육)' },
+                    { value: 'hrm', label: 'HRM (인사관리/노무)' },
+                    { value: 'od', label: 'OD (조직개발/조직문화)' },
+                    { value: 'recruiting', label: 'Recruiting (채용)' },
+                    { value: 'sales', label: 'Sales (영업/세일즈)' },
+                    { value: 'marketing', label: 'Marketing (마케팅/브랜딩)' },
+                    { value: 'it_dev', label: 'IT/Development (IT/개발)' },
+                    { value: 'design', label: 'Design (디자인)' },
+                    { value: 'strategy_planning', label: 'Strategy/Planning (전략/기획)' },
+                    { value: 'finance_accounting', label: 'Finance/Accounting (재무/회계)' },
+                    { value: 'rnd', label: 'R&D (연구개발)' },
+                    { value: 'other', label: '기타 (직접 입력)', hasTextInput: true },
+                ]
+            },
+            {
+                id: 'job_role',
+                label: '4. 귀하의 주된 역할(Role)을 선택해주세요',
+                type: 'radio',
+                required: true,
+                options: [
+                    { value: 'executive', label: '👑 C-Level/임원' },
+                    { value: 'leader', label: '🎩 리더/팀장' },
+                    { value: 'senior', label: '🎓 책임/시니어' },
+                    { value: 'junior', label: '🏃 실무자/주니어' },
+                    { value: 'consultant', label: '💡 컨설턴트/강사/코치' },
+                    { value: 'freelancer', label: '🚀 프리랜서/1인기업' },
+                    { value: 'other', label: '기타 (직접 입력)', hasTextInput: true },
+                ]
             },
             {
                 id: 'company_size',
-                label: '4. 소속 조직 규모는?',
+                label: '5. 소속 조직 규모는?',
                 type: 'radio',
                 options: [
                     { value: 'freelancer', label: '🙋 프리랜서 / 1인 기업' },
@@ -63,7 +80,7 @@ export const SURVEY_QUESTIONS = [
             },
              {
                 id: 'experience',
-                label: '5. 현재 직무(역할) 관련 총 경력은?',
+                label: '6. 현재 직무(역할) 관련 총 경력은?',
                 type: 'radio',
                 options: [
                    { value: 'under_1', label: '🌱 1년 미만' },
@@ -82,7 +99,7 @@ export const SURVEY_QUESTIONS = [
         questions: [
             {
                 id: 'ai_policy',
-                label: '6. 귀하 조직의 AI 사용 정책 수준은?',
+                label: '7. 귀하 조직의 AI 사용 정책 수준은?',
                 type: 'radio',
                 options: [
                     { value: 'formal_guideline', label: '📋 명문화된 AI 사용 가이드라인과 허용 도구 리스트 존재' },
@@ -96,7 +113,7 @@ export const SURVEY_QUESTIONS = [
             },
             {
                 id: 'allowed_tools',
-                label: '7. 조직에서 공식적으로 허용/제공하는 AI 도구는? (복수선택)',
+                label: '8. 조직에서 공식적으로 허용/제공하는 AI 도구는? (복수선택)',
                 type: 'checkbox',
                 options: [
                     // Multimodal
@@ -135,7 +152,7 @@ export const SURVEY_QUESTIONS = [
         questions: [
             {
                 id: 'first_use',
-                label: '8. 개인적으로 AI 도구를 처음 사용한 시기는?',
+                label: '9. 개인적으로 AI 도구를 처음 사용한 시기는?',
                 type: 'radio',
                 options: [
                     { value: 'before_2022', label: '🦕 2021년 이전 (GPT-3 이전 시대)' },
@@ -150,7 +167,7 @@ export const SURVEY_QUESTIONS = [
             },
             {
                 id: 'frequently_used',
-                label: '9. 현재 개인적으로 가장 자주 사용하는 AI 도구는? (최대 3개)',
+                label: '10. 현재 개인적으로 가장 자주 사용하는 AI 도구는? (최대 3개)',
                 type: 'checkbox',
                 options: [
                     // Multimodal
@@ -181,7 +198,7 @@ export const SURVEY_QUESTIONS = [
             },
             {
                 id: 'usage_frequency',
-                label: '10. 개인적인 AI 사용 빈도는?',
+                label: '11. 개인적인 AI 사용 빈도는?',
                 type: 'radio',
                 options: [
                     { value: 'very_frequent', label: '🔥 하루 10회 이상 (상시 활용)' },
@@ -218,7 +235,7 @@ export const SURVEY_QUESTIONS = [
         questions: [
             {
                 id: 'expectations',
-                label: '11. 교육에서 가장 기대하고 듣고 싶은 콘텐츠는? (최대 3개)',
+                label: '12. 교육에서 가장 기대하고 듣고 싶은 콘텐츠는? (최대 3개)',
                 type: 'checkbox',
                 options: [
                     { value: 'real_experience', label: '💡 (공통) 찐 HRD 실무자의 AI 활용 철학과 실전 노하우' },
@@ -234,7 +251,7 @@ export const SURVEY_QUESTIONS = [
             },
             {
                 id: 'personal_concerns',
-                label: '12. 교육에서 개인적으로 꼭 해결하고 싶은 고민은? (최대 2개)',
+                label: '13. 교육에서 개인적으로 꼭 해결하고 싶은 고민은? (최대 2개)',
                 type: 'checkbox',
                 options: [
                     { value: 'skill_improvement', label: '📚 AI 활용 역량을 체계적이고 효과적으로 향상시키는 방법' },
@@ -255,7 +272,7 @@ export const SURVEY_QUESTIONS = [
         questions: [
             {
                 id: 'main_concern',
-                label: '13. AI 활용과 관련하여 현재 가장 고민되는 이슈를 구체적으로 적어주세요 (선택사항)',
+                label: '14. AI 활용과 관련하여 현재 가장 고민되는 이슈를 구체적으로 적어주세요 (선택사항)',
                 type: 'textarea',
                 placeholder: `예:
 • 저희 회사는 유료 AI 툴 도입에 매우 보수적입니다. 무료 툴만으로 업무 효율을 높일 수 있는 현실적인 방법이 궁금합니다.
@@ -264,7 +281,7 @@ export const SURVEY_QUESTIONS = [
             },
             {
                 id: 'specific_request',
-                label: '14. 본 교육과정에서 꼭 다뤄주셨으면 하는 부분이나 궁금한 점이 있다면 적어주세요 (선택사항)',
+                label: '15. 본 교육과정에서 꼭 다뤄주셨으면 하는 부분이나 궁금한 점이 있다면 적어주세요 (선택사항)',
                 type: 'textarea',
                 placeholder: `예:
 • M365 코파일럿을 조직에 도입했는데, 실제 HR 업무(예: 채용공고 작성, 면접 질문 생성, 직원 설문 분석)에서 바로 쓸 수 있는 시나리오 중심으로 알려주세요.
@@ -273,7 +290,7 @@ export const SURVEY_QUESTIONS = [
             },
              {
                 id: 'personal_question',
-                label: '15. 데미안 임정훈 강사에게 개인적으로 질문하고 싶은 내용이 있다면 적어주세요 (선택사항)',
+                label: '16. 데미안 임정훈 강사에게 개인적으로 질문하고 싶은 내용이 있다면 적어주세요 (선택사항)',
                 type: 'textarea',
                 placeholder: `예:
 • AI 기술이 너무 빠르게 발전해서 따라가기 벅찹니다. HR 전문가가 놓치지 말아야 할 핵심 AI 트렌드는 무엇인가요?

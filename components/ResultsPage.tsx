@@ -5,6 +5,7 @@ import { downloadResultsAsPDF } from '../services/pdfService';
 import { fetchSubmissionById } from '../services/dataService';
 import type { DiagnosisResult } from '../types';
 import Spinner from './common/Spinner';
+import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 // --- Qualitative Analysis Data ---
 
@@ -113,7 +114,7 @@ const ResultsPage: React.FC = () => {
 
         getResultData();
     }, [userId]);
-
+    
     const qualitativeData = useMemo(() => {
         if (!result) return null;
         
@@ -124,6 +125,16 @@ const ResultsPage: React.FC = () => {
         
         return { level, profile: { name: profileKey, ...profile }, suggestions };
     }, [result]);
+
+     const chartData = useMemo(() => {
+        if (!result) return [];
+        return [
+            { name: '이해', score: result.scores.understanding, fill: '#00A9FF' },
+            { name: '활용', score: result.scores.application, fill: '#00E0C7' },
+            { name: '비판적 사고', score: result.scores.criticalThinking, fill: '#FFBB28' },
+        ];
+    }, [result]);
+
 
     const handleDownloadPDF = async () => {
         if (!result?.submissionData.responses.name || isDownloadingPdf) {
@@ -162,11 +173,13 @@ const ResultsPage: React.FC = () => {
             background-color: #ffffff !important;
             background-image: none !important;
             color: #1e293b !important;
+            border-color: #e2e8f0 !important;
         }
         .pdf-light-theme h1, .pdf-light-theme h2, .pdf-light-theme p, .pdf-light-theme strong, .pdf-light-theme span, .pdf-light-theme li {
              color: #1e293b !important;
         }
         .pdf-light-theme .text-cyan-400 { color: #0891b2 !important; }
+        .pdf-light-theme .text-cyan-300 { color: #06b6d4 !important; }
         .pdf-light-theme .text-transparent { color: #1e293b !important; }
         .pdf-light-theme .pdf-feedback-card {
             background-color: #eff6ff !important;
@@ -177,18 +190,24 @@ const ResultsPage: React.FC = () => {
             background-color: #f8fafc !important;
             border-color: #e2e8f0 !important;
         }
+        .pdf-light-theme .recharts-wrapper .recharts-surface {
+            background-color: transparent !important;
+        }
+        .pdf-light-theme .recharts-text, .pdf-light-theme .recharts-cartesian-axis-tick-value {
+             fill: #1e293b !important;
+        }
     `;
 
     return (
         <div className="max-w-5xl mx-auto">
             <style>{pdfStyles}</style>
-             <div id="results-content" className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-6 md:p-12 rounded-2xl shadow-2xl space-y-10">
-                <div className="text-center">
+             <div id="results-content" className="space-y-10">
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-12 rounded-2xl shadow-2xl text-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-300">{result.submissionData.responses.name}님의 AI 역량 진단 리포트</h1>
                     <p className="text-slate-400 mt-2">{new Date(result.submissionData.timestamp).toLocaleString('ko-KR')} 기준</p>
                 </div>
                 
-                <div className="pt-8 border-t border-slate-700">
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🏆 당신의 AI 활용 수준</h2>
                     <div className="bg-slate-800/50 p-8 rounded-lg text-center border border-slate-700 pdf-explanation-card">
                         <p className="text-4xl font-bold text-cyan-400 mb-4">{qualitativeData.level.name}</p>
@@ -196,21 +215,31 @@ const ResultsPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-slate-700">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">📈 영역별 역량 프로필</h2>
-                    <div className="bg-slate-800/50 p-8 rounded-lg border border-slate-700 grid md:grid-cols-2 gap-8 items-center pdf-explanation-card">
-                        <div className="text-center">
-                            <p className="text-xl text-slate-400">프로필 유형</p>
-                            <p className="text-3xl font-bold text-white mt-2">{qualitativeData.profile.name}</p>
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-8 text-center">📈 영역별 역량 프로필</h2>
+                    <div className="grid md:grid-cols-2 gap-8 items-center pdf-explanation-card bg-slate-800/50 p-8 rounded-lg border border-slate-700">
+                         <div className="w-full h-full flex items-center">
+                            <ResponsiveContainer width="100%" height={200}>
+                                <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 30, left: 10, bottom: 0 }}>
+                                    <XAxis type="number" domain={[0, 5]} hide />
+                                    <YAxis type="category" dataKey="name" width={80} tick={{ fill: '#e2e8f0', fontSize: 16 }} axisLine={false} tickLine={false} />
+                                    <Tooltip cursor={{fill: 'rgba(30, 41, 59, 0.5)'}} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}/>
+                                    <Bar dataKey="score" barSize={30} radius={[0, 10, 10, 0]}>
+                                        {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
-                        <div className="text-lg text-center md:text-left">
-                            <p className="font-semibold text-slate-200"><strong>특징:</strong> {qualitativeData.profile.description}</p>
-                            <p className="font-semibold text-slate-200 mt-3"><strong>발전 제안:</strong> <span className="text-cyan-300">{qualitativeData.profile.suggestion}</span></p>
+                        <div className="text-center md:text-left bg-slate-900/50 p-6 rounded-lg">
+                            <p className="text-xl text-slate-400">프로필 유형</p>
+                            <p className="text-3xl font-bold text-white mt-1">{qualitativeData.profile.name}</p>
+                            <p className="mt-4 text-slate-300"><strong>특징:</strong> {qualitativeData.profile.description}</p>
+                            <p className="mt-2 text-cyan-300"><strong>발전 제안:</strong> {qualitativeData.profile.suggestion}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-slate-700">
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🌱 다음 단계를 위한 맞춤형 성장 제안</h2>
                     <div className="bg-slate-800/50 p-8 rounded-lg border border-slate-700 pdf-explanation-card">
                         <ul className="space-y-4 list-disc list-inside text-slate-300 text-lg">
@@ -219,7 +248,7 @@ const ResultsPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-slate-700">
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl">
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🤖 AI 생성 맞춤 분석 및 제언</h2>
                      {isLoading ? <Spinner /> : (
                         <div className="bg-blue-900/30 p-8 rounded-lg whitespace-pre-wrap text-base text-blue-200 leading-relaxed border border-blue-500/50 pdf-feedback-card">
