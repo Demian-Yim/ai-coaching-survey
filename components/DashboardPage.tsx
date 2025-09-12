@@ -17,6 +17,39 @@ const ChartDescription: React.FC<{ analysis: string; checkpoint: string }> = ({ 
     </div>
 );
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        const name = payload[0].name;
+        const value = payload[0].value;
+
+        // Pie chart payload is different from Bar chart
+        const isPie = !label;
+        const finalLabel = isPie ? data.name : label;
+        const finalValue = isPie ? data.value : value;
+        const respondents = data.respondents || [];
+
+        return (
+            <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-600 p-3 rounded-lg shadow-lg text-sm max-w-xs z-50">
+                <p className="font-bold text-cyan-400 mb-2">{finalLabel}</p>
+                <p className="text-white font-semibold">{`${name || '응답 수'}: ${finalValue}명`}</p>
+                {respondents.length > 0 && (
+                    <>
+                        <hr className="border-slate-600 my-2" />
+                        <p className="font-semibold text-slate-300">응답자:</p>
+                        <ul className="list-none mt-1 text-slate-400 max-h-40 overflow-y-auto">
+                            {respondents.map((respondent: string, index: number) => (
+                                <li key={index} className="truncate">{respondent}</li>
+                            ))}
+                        </ul>
+                    </>
+                )}
+            </div>
+        );
+    }
+    return null;
+};
+
 
 const DashboardPage: React.FC = () => {
     const { submissions, setSubmissions, deleteSubmission, clearAllSubmissions } = useAppContext();
@@ -102,60 +135,76 @@ const DashboardPage: React.FC = () => {
         
             return {};
         };
+        
+        type Counts = Record<string, { value: number; respondents: string[] }>;
 
         const createCounts = (key: string) => {
             const labels = getOptionsMap(key);
-            return displayedSubmissions.reduce((acc, sub) => {
+            return displayedSubmissions.reduce((acc: Counts, sub) => {
+                const respondentName = sub.responses.name || 'Anonymous';
                 let value = sub.responses[key];
+
                 if (value === 'other') {
                     const otherText = sub.responses[`${key}_other_text`];
-                    value = otherText ? `기타: ${otherText}` : '기타';
-                    acc[value] = (acc[value] || 0) + 1;
+                    const label = otherText ? `기타: ${otherText}` : '기타';
+                    if (!acc[label]) acc[label] = { value: 0, respondents: [] };
+                    acc[label].value += 1;
+                    acc[label].respondents.push(respondentName);
                 } else if (value) {
-                    const name = labels[value] || value;
-                    acc[name] = (acc[name] || 0) + 1;
+                    const label = labels[value] || value;
+                    if (!acc[label]) acc[label] = { value: 0, respondents: [] };
+                    acc[label].value += 1;
+                    acc[label].respondents.push(respondentName);
                 }
                 return acc;
-            }, {} as Record<string, number>);
+            }, {});
         };
         
         const createMultiCounts = (key: string) => {
             const labels = getOptionsMap(key);
-            return displayedSubmissions.reduce((acc, sub) => {
+            return displayedSubmissions.reduce((acc: Counts, sub) => {
+                const respondentName = sub.responses.name || 'Anonymous';
                 const values = sub.responses[key];
+                
                 if (Array.isArray(values)) {
                     values.forEach(value => {
-                        const name = labels[value] || value;
-                        acc[name] = (acc[name] || 0) + 1;
+                        const label = labels[value] || value;
+                        if (!acc[label]) acc[label] = { value: 0, respondents: [] };
+                        acc[label].value += 1;
+                        acc[label].respondents.push(respondentName);
                     });
                 } else if (values) {
-                     const name = labels[values] || values;
-                     acc[name] = (acc[name] || 0) + 1;
+                     const label = labels[values] || values;
+                     if (!acc[label]) acc[label] = { value: 0, respondents: [] };
+                     acc[label].value += 1;
+                     acc[label].respondents.push(respondentName);
                 }
                 return acc;
-            }, {} as Record<string, number>);
+            }, {});
         };
 
-        const formatChartData = (counts: Record<string, number>) => 
+        const formatChartData = (counts: Counts) => 
             Object.entries(counts)
-                .map(([name, value]) => ({ name, value }))
+                .map(([name, data]) => ({ name, value: data.value, respondents: data.respondents }))
                 .sort((a, b) => b.value - a.value);
         
         const capabilityScores = displayedSubmissions.reduce((acc, sub) => {
-            acc.understanding += Number(sub.responses.understanding) || 0;
-            acc.application += Number(sub.responses.application) || 0;
-            acc.criticalThinking += Number(sub.responses.criticalThinking) || 0;
+            acc.understanding += parseFloat(String(sub.responses.understanding || 0));
+            acc.application += parseFloat(String(sub.responses.application || 0));
+            acc.criticalThinking += parseFloat(String(sub.responses.criticalThinking || 0));
             return acc;
         }, { understanding: 0, application: 0, criticalThinking: 0 });
 
         const total = displayedSubmissions.length;
+        const totalValidScores = displayedSubmissions.filter(s => s.responses.understanding && s.responses.application && s.responses.criticalThinking).length || total;
+
 
         const fullAnalysis = {
             total,
             avgCapability: [
-                { name: '이해', score: parseFloat((capabilityScores.understanding / total).toFixed(1)) },
-                { name: '활용', score: parseFloat((capabilityScores.application / total).toFixed(1)) },
-                { name: '비판적 사고', score: parseFloat((capabilityScores.criticalThinking / total).toFixed(1)) },
+                { name: '이해', score: parseFloat((capabilityScores.understanding / totalValidScores).toFixed(1)) },
+                { name: '활용', score: parseFloat((capabilityScores.application / totalValidScores).toFixed(1)) },
+                { name: '비판적 사고', score: parseFloat((capabilityScores.criticalThinking / totalValidScores).toFixed(1)) },
             ],
             jobFunctions: formatChartData(createCounts('job_function')),
             jobRoles: formatChartData(createCounts('job_role')),
@@ -326,7 +375,8 @@ const DashboardPage: React.FC = () => {
     
     const chartTooltipProps = {
         contentStyle: { backgroundColor: '#1e293b', border: '1px solid #334155', color: '#e2e8f0', fontSize: '14px' },
-        wrapperStyle: { zIndex: 1000 }
+        wrapperStyle: { zIndex: 1000 },
+        content: <CustomTooltip />
     };
     const chartAxisProps = {
         tick: { fill: '#cbd5e1', fontSize: 14 },
@@ -396,7 +446,7 @@ const DashboardPage: React.FC = () => {
                                     <CartesianGrid {...chartGridProps} />
                                     <XAxis dataKey="name" {...chartAxisProps} />
                                     <YAxis domain={[0, 5]} {...chartAxisProps}/>
-                                    <Tooltip {...chartTooltipProps}/>
+                                    <Tooltip {...chartTooltipProps} />
                                     <Legend wrapperStyle={{ color: "#e2e8f0", fontSize: '14px' }} />
                                     <Bar dataKey="score" fill="#00A9FF" name="평균 점수" />
                                 </BarChart>
