@@ -85,22 +85,39 @@ const DashboardPage: React.FC = () => {
     }, []);
 
     const dateFilteredSubmissions = useMemo(() => {
+        const parseDate = (dateString: string): Date | null => {
+            if (!dateString) return null;
+            // Handles YYYY-MM-DD format reliably by avoiding timezone issues
+            // with `new Date(string)`. It creates a date at midnight in the local timezone.
+            const parts = dateString.split('-').map(num => parseInt(num, 10));
+            if (parts.length !== 3 || parts.some(isNaN)) return null;
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        };
+    
+        const startDate = parseDate(dateRange.start);
+        const endDate = parseDate(dateRange.end);
+    
+        if (!startDate && !endDate) {
+            return submissions;
+        }
+    
         return submissions.filter(sub => {
-            if (!dateRange.start && !dateRange.end) return true;
             try {
-                // Ensure timestamp is valid before creating a Date object
                 if (!sub.timestamp || isNaN(new Date(sub.timestamp).getTime())) {
                     return false;
                 }
                 const subDate = new Date(sub.timestamp);
-                subDate.setHours(0, 0, 0, 0); // Normalize to start of day
-                
-                const startMatch = dateRange.start ? subDate >= new Date(dateRange.start) : true;
-                const endMatch = dateRange.end ? subDate <= new Date(dateRange.end) : true;
-
-                return startMatch && endMatch;
+                subDate.setHours(0, 0, 0, 0); // Normalize to start of the day in local time
+    
+                if (startDate && subDate < startDate) {
+                    return false;
+                }
+                if (endDate && subDate > endDate) {
+                    return false;
+                }
+                return true;
             } catch (e) {
-                console.error("Invalid date for submission:", sub);
+                console.error("Error parsing submission date:", sub.timestamp, e);
                 return false;
             }
         });
