@@ -52,7 +52,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 
 const DashboardPage: React.FC = () => {
-    const { submissions, setSubmissions, deleteSubmission, clearAllSubmissions } = useAppContext();
+    const { submissions, setSubmissions, deleteSubmission, deleteSelectedSubmissions, clearAllSubmissions } = useAppContext();
     const [summary, setSummary] = useState<string>('');
     const [isLoadingSummary, setIsLoadingSummary] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
@@ -154,48 +154,51 @@ const DashboardPage: React.FC = () => {
         };
         
         type Counts = Record<string, { value: number; respondents: string[] }>;
-
+        
         const createCounts = (key: string) => {
             const labels = getOptionsMap(key);
             return displayedSubmissions.reduce((acc: Counts, sub) => {
                 const respondentName = sub.responses.name || 'Anonymous';
-                let value = sub.responses[key];
+                const value = sub.responses[key];
 
-                if (value === 'other') {
-                    const otherText = sub.responses[`${key}_other_text`];
-                    const label = otherText ? `기타: ${otherText}` : '기타';
-                    if (!acc[label]) acc[label] = { value: 0, respondents: [] };
-                    acc[label].value += 1;
-                    acc[label].respondents.push(respondentName);
-                } else if (value) {
-                    const label = labels[value] || value;
-                    if (!acc[label]) acc[label] = { value: 0, respondents: [] };
+                if (value && typeof value === 'string') {
+                    let label = labels[value] || value;
+                    if (value === 'other') {
+                        const otherText = sub.responses[`${key}_other_text`];
+                        label = otherText ? `기타: ${otherText}` : '기타';
+                    }
+                    if (!acc[label]) {
+                        acc[label] = { value: 0, respondents: [] };
+                    }
                     acc[label].value += 1;
                     acc[label].respondents.push(respondentName);
                 }
                 return acc;
             }, {});
         };
-        
+
         const createMultiCounts = (key: string) => {
             const labels = getOptionsMap(key);
             return displayedSubmissions.reduce((acc: Counts, sub) => {
                 const respondentName = sub.responses.name || 'Anonymous';
-                const values = sub.responses[key];
-                
-                if (Array.isArray(values)) {
-                    values.forEach(value => {
-                        const label = labels[value] || value;
-                        if (!acc[label]) acc[label] = { value: 0, respondents: [] };
-                        acc[label].value += 1;
-                        acc[label].respondents.push(respondentName);
-                    });
-                } else if (values) {
-                     const label = labels[values] || values;
-                     if (!acc[label]) acc[label] = { value: 0, respondents: [] };
-                     acc[label].value += 1;
-                     acc[label].respondents.push(respondentName);
+                const rawValue = sub.responses[key];
+
+                let values: string[] = [];
+                if (Array.isArray(rawValue)) {
+                    values = rawValue.filter(item => typeof item === 'string' && item);
+                } else if (typeof rawValue === 'string' && rawValue) {
+                    values = rawValue.split(',').map(s => s.trim()).filter(Boolean);
                 }
+                
+                values.forEach(value => {
+                    const label = labels[value] || value;
+                    if (!acc[label]) {
+                        acc[label] = { value: 0, respondents: [] };
+                    }
+                    acc[label].value += 1;
+                    acc[label].respondents.push(respondentName);
+                });
+
                 return acc;
             }, {});
         };
@@ -251,7 +254,7 @@ const DashboardPage: React.FC = () => {
 
     useEffect(() => {
         const fetchSummary = async () => {
-            if (analysisData?.summaryPayload) {
+            if (analysisData?.summaryPayload && analysisData.summaryPayload.total > 0) {
                 setIsLoadingSummary(true);
                 try {
                     const result = await generateDashboardSummary(analysisData.summaryPayload);
@@ -262,7 +265,7 @@ const DashboardPage: React.FC = () => {
                     setIsLoadingSummary(false);
                 }
             } else {
-                 setSummary("분석할 데이터가 없습니다.");
+                 setSummary("분석할 데이터가 충분하지 않거나 API 키가 설정되지 않았습니다.");
             }
         };
         fetchSummary();
@@ -271,6 +274,17 @@ const DashboardPage: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (window.confirm('정말로 이 참여자의 데이터를 삭제하시겠습니까?')) {
             await deleteSubmission(id);
+        }
+    };
+
+    const handleDeleteSelected = async () => {
+        if (selectedIds.size === 0) {
+            alert('삭제할 참여자를 선택해주세요.');
+            return;
+        }
+        if (window.confirm(`선택된 ${selectedIds.size}명의 참여자 데이터를 정말로 삭제하시겠습니까?`)) {
+            await deleteSelectedSubmissions(selectedIds);
+            setSelectedIds(new Set()); // Clear selection after deletion
         }
     };
 
@@ -409,7 +423,15 @@ const DashboardPage: React.FC = () => {
         <div className="space-y-12">
             <div className="flex justify-between items-center flex-wrap gap-4">
                 <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-300">관리자 대시보드</h1>
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2">
+                    {selectedIds.size > 0 && (
+                        <button 
+                            onClick={handleDeleteSelected} 
+                            className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-500 transition-all border-2 border-yellow-400"
+                        >
+                            선택 삭제 ({selectedIds.size})
+                        </button>
+                    )}
                     <button onClick={exportToCSV} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-all border-2 border-green-400">CSV 내보내기</button>
                     <button onClick={handleClearAll} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-all border-2 border-red-400">전체 삭제</button>
                 </div>

@@ -59,16 +59,38 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     const deleteSubmission = async (id: string) => {
-        await deleteSubmissionById(id);
-        setSubmissions(prev => prev.filter(sub => sub.userId !== id));
+        try {
+            await deleteSubmissionById(id);
+            setSubmissions(prev => prev.filter(sub => sub.userId !== id));
+        } catch (error) {
+            console.error("Failed to delete submission:", error);
+            alert(`삭제에 실패했습니다. 잠시 후 다시 시도해주세요.`);
+        }
+    };
+
+    const deleteSelectedSubmissions = async (ids: Set<string>) => {
+        if (ids.size === 0) return;
+        try {
+            const deletePromises = Array.from(ids).map(id => deleteSubmissionById(id));
+            await Promise.all(deletePromises);
+            setSubmissions(prev => prev.filter(sub => !ids.has(sub.userId)));
+        } catch (error) {
+            console.error("Failed to delete selected submissions:", error);
+            alert(`선택된 항목 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.`);
+        }
     };
 
     const clearAllSubmissions = async () => {
-        await deleteAllSubmissions();
-        setSubmissions([]);
+        try {
+            await deleteAllSubmissions();
+            setSubmissions([]);
+        } catch (error) {
+            console.error("Failed to clear all submissions:", error);
+            alert(`전체 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.`);
+        }
     };
 
-    const value = { user, setUser, isAdmin, login, logout, submissions, setSubmissions, submitSurvey, findSubmission, deleteSubmission, clearAllSubmissions };
+    const value = { user, setUser, isAdmin, login, logout, submissions, setSubmissions, submitSurvey, findSubmission, deleteSubmission, deleteSelectedSubmissions, clearAllSubmissions };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

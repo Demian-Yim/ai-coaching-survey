@@ -13,7 +13,9 @@ const handleFetch = async <T,>(url: string, options?: RequestInit): Promise<T> =
         if (result.result !== 'success') {
             throw new Error(result.message || 'API request failed');
         }
-        return result.data as T;
+        // Return result.data if it exists, otherwise return the whole result object
+        // This handles varied successful response structures from the API
+        return (result.data ?? result) as T;
     } catch (error) {
         console.error('API call failed:', error);
         throw error;
@@ -55,9 +57,9 @@ export const postSurveySubmission = async (formData: any): Promise<{ id: string 
 };
 
 export const deleteSubmissionById = (id: string): Promise<{ message: string }> => {
-    return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteById&id=${id}`, { method: 'POST' });
+    return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteById&id=${id}`);
 };
 
 export const deleteAllSubmissions = (): Promise<{ message: string }> => {
-    return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteAll`, { method: 'POST' });
+    return handleFetch<{ message: string }>(`${WEB_APP_URL}?action=deleteAll`);
 };

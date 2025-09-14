@@ -214,6 +214,12 @@ const ResultsPage: React.FC = () => {
         ];
     }, [result]);
 
+    const formattedFeedback = useMemo(() => {
+        if (!result?.feedback) return '';
+        return result.feedback
+            .replace(/###\s*(.*)/g, '<h3 class="text-2xl font-bold text-cyan-300 mt-6 mb-3">$1</h3>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }, [result?.feedback]);
 
     const handleDownloadPDF = async () => {
         if (!result?.submissionData.responses.name || isDownloadingPdf) {
@@ -336,56 +342,38 @@ const ResultsPage: React.FC = () => {
                                 <div key={key} className="bg-slate-800/50 p-5 rounded-lg border border-slate-700 pdf-explanation-card">
                                     <h4 className="font-bold text-lg text-white">{details.title} - <span className="text-cyan-300">{score.toFixed(1)}점</span></h4>
                                     <p className="text-slate-300 mt-1 text-sm">{details.description}</p>
-                                    {levelText && <p className="text-slate-400 mt-2 text-sm border-t border-slate-700 pt-2">현재 수준: {levelText}</p>}
+                                    {levelText && <p className="mt-2 text-slate-200 text-sm bg-slate-700/50 p-3 rounded-md"><strong>현재 수준:</strong> {levelText}</p>}
                                 </div>
                             );
                         })}
                     </div>
                 </div>
 
-                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-8 text-center">💡 바로 실행하는 맞춤 성장 플랜</h2>
-                    <div className="bg-slate-800/50 p-8 rounded-lg border border-slate-700 pdf-explanation-card">
-                         <div className="space-y-8">
-                            {qualitativeData.suggestions.map((item, index) => (
-                                <div key={index} className="flex items-start gap-4">
-                                    <div className="text-3xl mt-1">{item.icon}</div>
-                                    <div>
-                                        <h4 className="font-bold text-xl text-slate-200">{item.title}</h4>
-                                        <p className="text-slate-300 mt-1 text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: item.content }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">🧑‍🔬 닥터 AI의 초개인화 분석 리포트</h2>
-                     {isLoading ? <Spinner /> : (
-                        <div className="bg-blue-900/30 p-8 rounded-lg whitespace-pre-wrap text-base text-blue-200 leading-relaxed border border-blue-500/50 pdf-feedback-card" dangerouslySetInnerHTML={{ __html: result?.feedback.replace(/###\s/g, '<h3 class="text-2xl font-bold text-cyan-300 mt-6 mb-3">').replace(/-\s\*\*/g, '- **') || '' }}>
-                        </div>
-                    )}
-                </div>
-            </div>
-            <div className="text-center mt-8">
-                <button 
-                    onClick={handleDownloadPDF}
-                    disabled={isDownloadingPdf}
-                    className="bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-green-500 transition-all shadow-lg border-2 border-green-400 disabled:bg-slate-500 disabled:cursor-not-allowed flex items-center justify-center mx-auto"
-                >
-                    {isDownloadingPdf ? (
-                        <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                            PDF 생성 중...
-                        </>
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 p-8 md:p-10 rounded-2xl shadow-2xl pdf-feedback-card">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-200 mb-6 text-center">💬 닥터 AI의 초개인화 피드백</h2>
+                    {isLoading ? (
+                        <Spinner />
                     ) : (
-                       '📄 결과 PDF로 저장하기'
+                        <div
+                            className="prose prose-invert max-w-none prose-p:text-slate-300 prose-strong:text-slate-100 prose-headings:text-cyan-300"
+                            dangerouslySetInnerHTML={{ __html: formattedFeedback }}
+                        />
                     )}
-                </button>
+                </div>
+                
+                <div className="text-center mt-10">
+                    <button
+                        onClick={handleDownloadPDF}
+                        disabled={isDownloadingPdf}
+                        className="bg-cyan-500 text-slate-900 font-bold py-4 px-10 rounded-lg text-xl hover:bg-cyan-400 transition-all transform hover:scale-105 shadow-lg disabled:bg-slate-600 neon-glow border-2 border-cyan-300"
+                    >
+                        {isDownloadingPdf ? 'PDF 생성 중...' : '💾 진단 결과 PDF로 저장하기'}
+                    </button>
+                </div>
             </div>
         </div>
     );
 };
 
+// FIX: Add default export to make the component available for import in other files.
 export default ResultsPage;

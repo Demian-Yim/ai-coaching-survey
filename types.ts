@@ -38,5 +38,6 @@ export interface AppContextType {
   submitSurvey: (formData: any) => Promise<string>;
   findSubmission: (userId: string) => SurveySubmission | undefined;
   deleteSubmission: (id: string) => Promise<void>;
+  deleteSelectedSubmissions: (ids: Set<string>) => Promise<void>;
   clearAllSubmissions: () => Promise<void>;
 }
