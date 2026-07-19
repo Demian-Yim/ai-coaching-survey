@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { generateDiagnosisFeedback } from '../services/geminiService';
 import { downloadResultsAsPDF } from '../services/pdfService';
 import { fetchSubmissionById } from '../services/dataService';
@@ -216,9 +217,12 @@ const ResultsPage: React.FC = () => {
 
     const formattedFeedback = useMemo(() => {
         if (!result?.feedback) return '';
-        return result.feedback
+        const html = result.feedback
             .replace(/###\s*(.*)/g, '<h3 class="text-2xl font-bold text-cyan-300 mt-6 mb-3">$1</h3>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // result.feedback is LLM-generated text from the Gemini API (services/geminiService.ts).
+        // It is external, non-deterministic content, so sanitize before rendering as HTML.
+        return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['h3', 'strong'], ALLOWED_ATTR: ['class'] });
     }, [result?.feedback]);
 
     const handleDownloadPDF = async () => {
